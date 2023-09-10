@@ -1,16 +1,10 @@
 ﻿namespace CalculateProductNumber;
 
-using System.ComponentModel.Design;
-using System.Net.Mail;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using Microsoft.VisualBasic;
 using NCDK;
 using NCDK.Aromaticities;
 using NCDK.Graphs;
-using NCDK.IO;
 using NCDK.Isomorphisms;
-using NCDK.QSAR.Descriptors.Moleculars;
 using NCDK.SMARTS;
 
 class Program
