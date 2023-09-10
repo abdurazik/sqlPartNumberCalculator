@@ -1,0 +1,56 @@
+CnNO
+
+59:Nucleosides
+O1C([NR,nR])CCC1  //Lazypattern THF bonded to Nitrogen (alophatic or aromatic) in ring
+
+58:Amino Acid Derivatives
+NCC(=O)[!C]
+
+57:Amino Acid and their salts
+NCC(=O)[O,O-]
+
+56:Carbamic acid/Carbamates/hydrazide
+OC(=O)N // Covers Carbamic acid/Carbamates
+
+55:Nitro amines/amides/nitriles
+N[N+](=O)[O-] // nitro amines
+C(=O)N        // amides
+C#N           // nitriles
+
+54:Nitro
+[N+](=O)[O-]
+
+53:Ureas/Uracils
+NC(=O)N            //ureas
+C1=CC(=O)NC(=O)N1  //Uracil base
+
+52:Nitrosamine/Diazene oxide
+NN=O        //nitrosamine
+N=[N+][O-]  //diazene oxide
+
+50:Nitrones / Nitrile oxides / amine oxides
+C=[N+][O-]      //Nitrone
+C#[N+][O-]      //Nitrile oxide
+*[N+](*)(*)[O-] //Amine oxide
+
+49:Cyanate / Isocyanate
+N=C=O        //isocyanate
+O=C=[N-]     //cyanate res
+[O+]#C-[N2-] //cyanate res
+
+48:Amide/Lactam/Amino ketones
+C(=O)N    //amide
+N@C(=O)   //Lactam
+C(=O)CN   //alpha amino ketone beta/gamma included?
+
+47:Oximes / Hydroxylamines
+C=NO     //oxime
+NO       //hydroxylamine
+
+46:Cyanohydrin / Acyl cyanide
+C(O)C#N    //Cyanohydrin
+C(=O)C#N   //Acyl cyanide
+
+45:Nitroso/Nitroxide
+N=O  //nitroso
+

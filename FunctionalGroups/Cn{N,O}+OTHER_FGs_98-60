@@ -1,0 +1,129 @@
+Cn{N,O}+OTHERS NON METAL
+
+98:Polymers
+\\give warning
+91-97:Reserved
+
+90:Other silanes
+\\ TODO
+
+89:Amido/imino/ketoximino silanes
+C(=O)N[Si] //Amido
+C=N[Si]    //imino
+[Si]C=N    //imino
+[Si]C=NO   //ketoximino
+
+88:[Si]lazane
+[Si]N[Si]
+
+87:Amino silanes
+NC[Si]    //alpha
+NCC[Si]   //beta
+NCCC[Si]  //gamma
+
+86:[Si]lane ester
+C(=O)O[Si]
+
+85:[Si]loxane
+[Si]O[Si]
+
+84:Aryloxysilane
+[Si]O[c,n,o]
+
+83:Alkoxy silanes
+[Si]OC
+
+82:Silanol 
+[Si]O
+
+81:Halosilane
+[Si][F,Cl,Br,I]
+
+80:Silanes
+C[Si](C)(C)C
+
+79:Phosphazenes/phosphoramide
+N1P=NP=NP1   /phosphazene ring
+[S,O]=PN     /phosphoramide
+
+78:Phosphorus ylide / Phosphorane
+c1ccccc1[P+](c1ccccc1)(c1ccccc1)[C-]   //ylide
+c1ccccc1P(c1ccccc1)(c1ccccc1)=C        //ylide
+[Pv5][!#1]
+//TODO PHOSPHORANES
+
+77:Phosphonate
+P(=O)(OC)(OC)C
+
+76:Phosphonium
+*-[P+](-*)(-*)-*
+
+75:Phosphates
+OP(=O)(O)O
+
+74:Phosphite/phosphine oxide //I've seen halogen bonded to phosphorus double check this
+O=P([H])(OC)(OC)
+COP(OC)OC
+
+73:Halophosphines
+*P(*)[F,Cl,Br,I]
+*P([F,Cl,Br,I])[F,Cl,Br,I]
+[F,Cl,Br,I]P([F,Cl,Br,I])[F,Cl,Br,I]
+
+72:Phosphines
+*[Pv3](*)*
+
+71:Sulfur Halides
+[F,Cl,Br,I]S([F,Cl,Br,I])([F,Cl,Br,I])([F,Cl,Br,I])[F,Cl,Br,I]
+
+70:
+S@[!C]
+S@C@[!C]
+S@C@C@[!C]
+S@C@C@C@[!C]
+
+69:Sulfonamide / Sulfonimide / amino-sulfur . Ammonium sulfur salts
+S(=O)(=O)N   //Sulfonamide
+S(=O)(=O)N=C //Sulfonimide
+// TODO amino-sulfur & Ammonium sulfur
+
+68:Thiocyanate / Isothiocyante
+S=C=N*    //Thiocyanate
+[S-]C=N   //Thionate res
+S=C=[N-]  //Thionate res
+
+67:Thiocarbonyl / Thiocarboxy / Thiamide / Thiourea / S+ -COOH
+C(=S)      //thiocarbonyl
+C(=O)S[H]  //thiocarboxy
+C(=S)N     //thioamide
+NC(=S)N    //thiourea
+C(=S)O[H]  //thioacid? S+ COOH
+
+66:Sulfides/Disulfides/polysulfides
+CSC     //sulfide
+S-S     //polysulfide
+
+
+64:Sulfonates/Sulfates    // this must be checked before 65
+CS(=O)(=O)[O-]     //sulfonate
+[O-]S(=O)(=O)[O-]  //sulfate
+
+65:Sulfinate/Sulfoxide
+CS(=O)[O-]  //Sulfinate
+CS(=O)C     //sulfoxide
+
+63:sulfonyloxy / sulfone
+CS(=O)(=O)OC  //sulfonyloxy
+CS(=O)(=O)c
+
+62:sulphenyl,sulfinyl,sulfonyl Halides
+CS[F,Cl,Br,I]
+CS(=O)[F,Cl,Br,I]
+CS(=O)(=O)[F,Cl,Br,I]
+
+61:Thiols/Thiophenols
+CS[H]
+
+60:Organoboron / organic borate / lewis adducts / organic borate salts
+B
+

@@ -1,0 +1,98 @@
+CnO
+
+29: Keto-acid/ester or Hydroxy Acid/ester
+C(=O)C(=O)O   //alpha
+C(=O)CC(=O)O  //beta
+C(=O)CCC(=O)O //gamma
+
+C(O)C(=O)O    //alpha
+C(O)CC(=O)O   //beta
+C(O)CCC(=O)O  //gamma
+
+28: Carbonates
+C(=O)(OC)OC
+
+27: Peroxyacids/esters
+C(=O)OO 
+
+26: Anhydrides
+C(=O)OC(=O)
+
+25: Lactones // only if cyclic
+[O]@[C](=O)
+
+24: Unsaturated esters (acryl, etc)
+C=CC(=O)O
+C=CCC(=O)OC
+
+23: Esters
+C(=O)OC
+
+22: Carboxylates
+C(=O)[O-].[+1]
+
+21: Carboxylic Acids
+C(=O)O[#1]
+
+20: Hydroxy Ketones //check if gamma needs to be considered
+C(=O)CO[#1]   //alpha
+C(=O)CCO[#1]  //beta
+
+19: Ketenes
+C=C=O
+
+18: Diketones, polycarbonyl
+CC(=O)C //check for more than one
+
+17: Ketones and their hydrates
+CC(=O)C //Only one
+
+16: Acid halides
+[F,Cl,Br,I]C(=O)
+
+15: Aldehydes
+[#1]C=O
+
+14: Peroxides/Oxonium
+O-O
+*[O+](*)* // Oxonium pattern
+
+13: Hypohalites, halohydrin
+CO[F,Cl,Br,I]
+
+12: Carbohydrates
+// Count number of Oxygens if > 3 give warning
+
+11: Crown Ethers
+// Count number of Oxygens if > 3 give warning
+
+9: Epoxides // Should be check before cyclic ethers since 10 search includes epoxides in result
+C1OC1
+
+10: Cyclic ethers // only if cyclic
+C@O@C@C
+
+8: Polyethers, acetals,ketals
+COC // count
+C(O*)(O*)[C,H]
+
+7: Ethers
+COC
+
+6: Hemiacetal/ketal
+C(OC)(O[#1])[C,H]
+
+5: Polyols
+CO[#1] // get uniq must be > 1
+
+4: Diols
+C(O[#1])O[#1]
+
+3: Tertiary Alchohols
+C(O)(C)(C)(C)
+
+2: Secondary Alchohols
+C(O)(C)(C)
+
+1: Primary Alchohols
+CO
