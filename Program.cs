@@ -13,8 +13,6 @@ class Program
 {
     static public char FirstCharachter(string smiles, IAtomContainer molecule)
     {
-        
-
         bool containsOxygen = false;
         bool containsNitrogen = false;
         bool Other = false; // Sulfur, Boron, Phosphorus
@@ -156,7 +154,7 @@ class Program
         return true;
 
     }
-    static public string CnOFGEvaluator(string smiles,IAtomContainer molecule)
+    static public string CnO_FGEvaluator(string smiles,IAtomContainer molecule)
     {
         if
         (
@@ -255,13 +253,68 @@ class Program
         }
         return "E";
     }
+    static public string CnN_FGEvaluator(string smiles,IAtomContainer molecule)
+    {
+
+        if
+        (
+            SmartsPattern.Create("N1C=NC(C=NC=N2)=C12").Matches(molecule) ||
+            Pattern.CreateIdenticalFinder(Chem.MolFromSmiles("N1C=NC(C=NC=N2)=C12")).Matches(molecule)
+        ) return "43"; //purines
+        
+        else if (SmartsPattern.Create("[N-]=[N+]=NC").Matches(molecule)) return "42"; //azides
+        else if
+        (
+            SmartsPattern.Create("[C,c]C(=N)N").Matches(molecule) || //amidines
+            SmartsPattern.Create("NC(=N)N").Matches(molecule)        //guanidines
+        )return "41";
+        
+        else if(SmartsPattern.Create("[C,c]N=NC").Matches(molecule)) return "40"; //azo
+        else if
+        (
+            SmartsPattern.Create("N-N").Matches(molecule) ||     //Hydrazine
+            SmartsPattern.Create("[C,c](=NN)").Matches(molecule) //Hydrazone
+        )return "39";
+        
+        
+        else if
+        (
+            SmartsPattern.Create("C#N").Matches(molecule) || //nitriles
+            SmartsPattern.Create("[N+]#[C-]").Matches(molecule) //isonitrile
+        )return "37"; 
+        
+        else if
+        (
+            SmartsPattern.Create("[C,c]=CN").Matches(molecule) || //enamines
+            SmartsPattern.Create("[C,c]=C=N").Matches(molecule)  //ketenamines
+        )return "36"; //enamines/ketenamines
+        
+        else if (SmartsPattern.Create("[C,c]=N").Matches(molecule))return "35"; //imines
+        else if(SmartsPattern.Create("[C,c]1N[C,c]1").Matches(molecule))return "34"; //aziridines
+        else if(SmartsPattern.Create("*[N+](*)(*)*").Matches(molecule))return "33"; //ammonium
+        else if(SmartsPattern.Create("[C,c]N([C,c])[C,c]").Matches(molecule))return "32"; //tertiary amines
+        else if(SmartsPattern.Create("[C,c]N[C,c]").Matches(molecule))return "31"; //secondary amines
+        else if(SmartsPattern.Create("[C,c]N").Matches(molecule))return "30";
+        
+        return "E";
+    }
+    static public string CnNO_FGEvaluator(string smiles,IAtomContainer molecule)
+    {
+
+        return "E";
+    }
+    static public string Cn_OthersEvaluator(string smiles, IAtomContainer molecule)
+    {
+        return "E";
+    }
     static void Main(string[] args)
     {
-        string smiles = "CCC(=O)COC";
+        string smiles = "C=C=N";
         IAtomContainer molecule = Chem.MolFromSmiles(smiles);
         
         //Console.WriteLine(CnOFGEvaluator(smiles,molecule));
-        Console.WriteLine(SmartsPattern.Create("C(=O)C[OC]").Matches(molecule));
+        string fg = CnN_FGEvaluator(smiles,molecule);
+        Console.WriteLine("FG_CODE: {0}",fg);
         
     }
 }
