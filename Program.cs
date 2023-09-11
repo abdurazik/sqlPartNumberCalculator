@@ -1,11 +1,13 @@
 ﻿namespace CalculateProductNumber;
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using NCDK;
 using NCDK.Aromaticities;
 using NCDK.Graphs;
 using NCDK.Isomorphisms;
 using NCDK.SMARTS;
+using NCDK.Smiles;
 
 class Program
 {
@@ -154,14 +156,112 @@ class Program
         return true;
 
     }
+    static public string CnOFGEvaluator(string smiles,IAtomContainer molecule)
+    {
+        if
+        (
+            SmartsPattern.Create("C(=O)C(=O)O").Matches(molecule)   | //alpha keto-acid/ester
+            SmartsPattern.Create("C(=O)CC(=O)O").Matches(molecule)  | //beta keto-acid/ester
+            SmartsPattern.Create("C(=O)CCC(=O)O").Matches(molecule) | //gamma keto-acid/ester
+            SmartsPattern.Create("C([OH])C(=O)O").Matches(molecule) | //alpha hydroxy-acid/ester
+            SmartsPattern.Create("C([OH])CC(=O)O").Matches(molecule)| //beta hydroxy-acid/ester
+            SmartsPattern.Create("C([OH])CCC(=O)O").Matches(molecule) //gamma hydroxy-acid/ester
+        ) return "29";
+
+        else if (SmartsPattern.Create("[C,c](=O)(OC)O[C,c]").Matches(molecule)) return "28"; //carbonates
+        else if (SmartsPattern.Create("C(=O)OO").Matches(molecule)) return "27"; //peroxyacids/esters
+        else if (SmartsPattern.Create("C(=O)OC(=O)").Matches(molecule)) return "26"; //anhydrides
+        else if (SmartsPattern.Create("[O]@[C](=O)").Matches(molecule)) return "25"; //Lactones TODO:check only if cyclic
+        else if 
+        (
+            SmartsPattern.Create("C=CC(=O)OC").Matches(molecule)  | //alpha unsat-ester
+            SmartsPattern.Create("C=CCC(=O)OC").Matches(molecule)   //beta unsat-ester
+        )return "24"; //TODO:Check double bond on ester side
+        
+        else if(SmartsPattern.Create("C(=O)O[C,c]").Matches(molecule)) return "23"; //esters
+        else if (SmartsPattern.Create("C(=O)[O-].[+1]").Matches(molecule)) return "22"; //carboxylates
+        else if(SmartsPattern.Create("C(=O)[OH]").Matches(molecule)) return "21"; //carboxylic acids
+        else if
+        (
+            SmartsPattern.Create("C(=O)C[OH]").Matches(molecule)  |  //alpha hydroxy-ketone
+            SmartsPattern.Create("C(=O)CC[OH]").Matches(molecule) |  //beta hydroxy-ketone
+            SmartsPattern.Create("C(=O)CCC[OH]").Matches(molecule)   //gamma hydroxy-ketone TODO:check if this should be removed
+        ) return "20"; //hydroxy ketones
+        
+        else if (SmartsPattern.Create("[C,c]=C=O").Matches(molecule)) return "19"; //ketenes
+        else if (SmartsPattern.Create("[C,c]=O").Matches(molecule))
+        {
+            int uniqueCarbonyls = SmartsPattern.Create("[C,c]=O").
+                                                MatchAll(molecule).
+                                                GetUniqueAtoms().
+                                                ToSubstructures().
+                                                Count();
+            
+            if (uniqueCarbonyls > 1) return "18"; //diketones/polycarbonyl
+            else return "17"; //ketone
+        }
+        else if(SmartsPattern.Create("C([OH])[OH]").Matches(molecule))return "17" ; //ketone-hydrate (geminal-diol)) return "17";
+        else if(SmartsPattern.Create("[F,Cl,Br,I]C(=O)").Matches(molecule)) return "16"; //acid halides
+        else if(SmartsPattern.Create("[#1]C=O").Matches(molecule)) return "15"; //aldehydes
+        else if
+        (
+            SmartsPattern.Create("O-O").Matches(molecule) |
+            SmartsPattern.Create("*[O+](*)*").Matches(molecule)
+        ) return "14"; //peroxides/oxonium
+        
+        else if 
+        (
+            SmartsPattern.Create("[O-][F,Cl,Br,I]").Matches(molecule)|      //Hypophalite
+            SmartsPattern.Create("C([OH])C[F,Cl,Br,I]").Matches(molecule)  //halohydrin
+        ) return "13";
+
+        int OxygenCount = (from character in smiles
+                          where character == 'O'
+                          select character).Count();
+        if(OxygenCount > 3)
+        {
+            Console.WriteLine("[WARNING] Current implementation can't detect Carbohydrates (functional group code:12)");
+            Console.WriteLine("[WARNING] Current implementation can't detect Crown Ethers (functional group code:11)"); 
+        }
+        
+        else if(SmartsPattern.Create("C1OC1").Matches(molecule)) return "9"; //epoxides
+        else if(SmartsPattern.Create("C@O@C@C").Matches(molecule)) return "10"; //cyclic ethers
+        else if (SmartsPattern.Create("C(OC)(OC)[C,H]").Matches(molecule)) return "8"; //hemiacetal poly ethers handled with Ethers in next evaluation
+        else if(SmartsPattern.Create("[c,C]O[C,c]").Matches(molecule))
+        {
+            int etherSubstrucCount = SmartsPattern.Create("[c,C]O[C,c]")
+                         .MatchAll(molecule)
+                         .GetUniqueAtoms()
+                         .ToSubstructures()
+                         .Count();
+            if(etherSubstrucCount > 1) return "8";
+            else return "7";         
+        }
+        else if(SmartsPattern.Create("[C,c]O").Matches(molecule)) //alchohols
+        {
+            int alchoholSubsctructureCount = SmartsPattern.Create("[C,c]O")
+                         .MatchAll(molecule)
+                         .GetUniqueAtoms()
+                         .ToSubstructures()
+                         .Count();
+            if(alchoholSubsctructureCount > 2) return "5"; //polyols
+            else if(alchoholSubsctructureCount ==2) return "4"; //diols
+
+            //If only one alchohol present
+            else if(SmartsPattern.Create("cO").Matches(molecule)) return "1"; //weird rule, alchohols bonded to aromatic ring are regarded as primary. Legacy convention
+            else if(SmartsPattern.Create("C(O)(C)C").Matches(molecule)) return"3"; //tert
+            else if(SmartsPattern.Create("CC(O)C").Matches(molecule)) return"2"; //second
+            else return "1"; //must be primary
+        }
+        return "E";
+    }
     static void Main(string[] args)
     {
-        string smiles = "C2CCCCC2CCCCC=C";
-        
+        string smiles = "CCC(=O)COC";
         IAtomContainer molecule = Chem.MolFromSmiles(smiles);
         
-        Console.WriteLine(SecondCharachter(smiles,molecule));
-
+        //Console.WriteLine(CnOFGEvaluator(smiles,molecule));
+        Console.WriteLine(SmartsPattern.Create("C(=O)C[OC]").Matches(molecule));
         
     }
 }

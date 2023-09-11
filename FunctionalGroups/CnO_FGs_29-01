@@ -5,9 +5,9 @@ C(=O)C(=O)O   //alpha
 C(=O)CC(=O)O  //beta
 C(=O)CCC(=O)O //gamma
 
-C(O)C(=O)O    //alpha
-C(O)CC(=O)O   //beta
-C(O)CCC(=O)O  //gamma
+C(O[H])C(=O)O    //alpha
+C(O[H])CC(=O)O   //beta
+C(O[H])CCC(=O)O  //gamma
 
 28: Carbonates
 C(=O)(OC)OC
@@ -94,5 +94,5 @@ C(O)(C)(C)(C)
 2: Secondary Alchohols
 C(O)(C)(C)
 
-1: Primary Alchohols
+11: Primary Alchohols
 CO
