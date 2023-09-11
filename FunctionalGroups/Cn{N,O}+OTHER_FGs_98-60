@@ -77,10 +77,10 @@ COP(OC)OC
 [F,Cl,Br,I]S([F,Cl,Br,I])([F,Cl,Br,I])([F,Cl,Br,I])[F,Cl,Br,I]
 
 70:
-S@[!C]
-S@C@[!C]
-S@C@C@[!C]
-S@C@C@C@[!C]
+[S,s]@[!C;!c]
+[S,s]@[C,c]@[!C;!c]
+[S,s]@[C,c]@[C,c]@[!C;!c]
+[S,s]@[C,c]@[C,c]@[C,c]@[!C;!c]
 
 69:Sulfonamide / Sulfonimide / amino-sulfur . Ammonium sulfur salts
 S(=O)(=O)N   //Sulfonamide
