@@ -8,15 +8,15 @@ N1C=NC(C=NC=N2)=C12 //purine base
 [N-]=[N+]=NC
 
 41:Amidine/Guanidine
-CC(=N)N    // Amidines
+[C,c]C(=N)N    // Amidines
 NC(=N)N    // Guanidines
 
 40:Azo (Diazene)
-CN=NC
+[C,c]N=NC
 
 39:Hydrazine/zone
 NN     // hydrazines
-C(=NN) // hydrazones
+[C,c](=NN) // hydrazones
 
 37:Nitrile/Isonitrile
 C#N        // nitriles
@@ -24,6 +24,7 @@ C#N        // nitriles
 
 36:enamines/ketenamines
 C=CN
+C=C=N
 
 35:Imines
 C=N
@@ -32,7 +33,7 @@ C=N
 C1NC1
 
 33:Ammonium
-*[N+](*)(*)(*)
+*[N+](*)(*)*
 
 32:Tertiary Amines
 CN(C)C
