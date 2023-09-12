@@ -47,7 +47,7 @@ class Program
         {
             if
             (
-                SmartsPattern.Create("[!CR,!cR&!nX5]").Matches(molecule) &&
+                SmartsPattern.Create("[!CR,!cR;n!v5]").Matches(molecule) && // any cyclic atom not carbon and nitrogen with valence of 5 to handle a weird case
                 !(cycleCount == 1 && SmartsPattern.Create("C1[N,O]C1").Matches(molecule))
             ) return 'H';
             
@@ -138,7 +138,7 @@ class Program
             {
                 
                 if(_atom.IsAromatic) continue;
-                if (!(new Regex(@"C(?![a-z])|F|C(?=l)|B(?=r)|I").IsMatch(_atom.Symbol))) return false; //Check if atom bonded to polyvalents (other than Carbon)
+                if (!(new Regex(@"C(?![a-z])|F|C(?=l)|B(?=r)|I|H").IsMatch(_atom.Symbol))) return false; //Check if atom bonded to polyvalents (other than Carbon)
                 
                 bool Enqueue = true;
                 foreach(var atom in searched) // Check if atom has already been searched
