@@ -478,7 +478,7 @@ class Program
         new Regex(@"^(.+),(.+)\n").Matches(fileContents);
         
         
-        Console.WriteLine(CalculatePN(smiles));
+        //Console.WriteLine(CalculatePN(smiles));
         
     }
 }
