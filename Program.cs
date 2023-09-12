@@ -18,11 +18,23 @@ class Program
         bool containsNitrogen = false;
         bool Other = false; // Sulfur, Boron, Phosphorus
 
-        if(new Regex(@"O(?![a-z])").IsMatch(smiles)) containsOxygen = true;
-        if(new Regex(@"N(?![a-z])").IsMatch(smiles)) containsNitrogen = true;
+        if(
+        new Regex(@"O(?![a-z])").IsMatch(smiles) |
+        new Regex(@"(?<!\[C)o").IsMatch(smiles)   //for smarts aromatic oxy
+        ) containsOxygen = true;
+        
+        if
+        (
+            new Regex(@"N(?![a-z])").IsMatch(smiles) |
+            new Regex(@"(?<!\[C)n").IsMatch(smiles)    //for smarts aromatic nitro
+        ) containsNitrogen = true;
+        
         if(new Regex(@"S(?![a-z])").IsMatch(smiles) |
            new Regex(@"P(?![a-z])").IsMatch(smiles) |
-           new Regex(@"B(?![a-z])").IsMatch(smiles)) Other = true;
+           new Regex(@"B(?![a-z])").IsMatch(smiles) |
+           new Regex(@"(?<!\[C)s").IsMatch(smiles)  | //for smarts aromatic sulfur
+           new Regex(@"(?<!\[C)p").IsMatch(smiles)    //for smarts aromatic phosphorus
+           ) Other = true;
         
         if(containsOxygen)
         {
@@ -397,6 +409,9 @@ class Program
     }
     static public string CalculatePN(string smiles)
     {
+
+        if (smiles == null || smiles == "") return "EEEE-";
+        
         char firstCharachter = 'E';
         char secondCharachter ='E';
         string FGCode = "EE";
@@ -458,7 +473,11 @@ class Program
     }
     static void Main(string[] args)
     {
-        string smiles = args[0];
+        string fp = args[0];
+        string fileContents = File.ReadAllText(fp);
+        new Regex(@"^(.+),(.+)\n").Matches(fileContents);
+        
+        
         Console.WriteLine(CalculatePN(smiles));
         
     }
