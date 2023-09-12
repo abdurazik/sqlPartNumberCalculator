@@ -334,7 +334,11 @@ class Program
             SmartsPattern.Create("C#N[!O]").Matches(molecule)             //nitrile
         ) return "55";
         
-        else if (SmartsPattern.Create("[N+](=O)[O-]").Matches(molecule)) return "54"; //nitrated
+        else if 
+        (
+            SmartsPattern.Create("[N+](=O)[O-]").Matches(molecule) ||
+            SmartsPattern.Create("N(=O)=O").Matches(molecule)
+        ) return "54"; //nitrated
         else if 
         (
             SmartsPattern.Create("[N,n][C,c](=O)[N,n]").Matches(molecule) || //ureas
