@@ -43,12 +43,11 @@ class Program
     {   
         int cycleCount = Cycles.FindAll(molecule).GetNumberOfCycles();
         bool isCyclic = cycleCount > 0;
-        Console.WriteLine("No. Cycles {0}", Cycles.FindAll(molecule).GetNumberOfCycles());
         if (isCyclic)
         {
             if
             (
-                SmartsPattern.Create("[!CR,!cR]").Matches(molecule) &&
+                SmartsPattern.Create("[!CR,!cR&!nX5]").Matches(molecule) &&
                 !(cycleCount == 1 && SmartsPattern.Create("C1[N,O]C1").Matches(molecule))
             ) return 'H';
             
@@ -229,10 +228,18 @@ class Program
             Console.WriteLine("[WARNING] Current implementation can't detect Crown Ethers (functional group code:11)"); 
         }
         
-        else if(SmartsPattern.Create("C1OC1").Matches(molecule)) return "09"; //epoxides
-        else if(SmartsPattern.Create("C@O@C@C").Matches(molecule)) return "10"; //cyclic ethers
+        if(SmartsPattern.Create("C1OC1").Matches(molecule)) return "09"; //epoxides
+        else if(SmartsPattern.Create("C@[O,o]@C@C").Matches(molecule)) 
+        {
+            int cyclicEtherCount = SmartsPattern.Create("C@O@C@C")
+                         .MatchAll(molecule)
+                         .GetUniqueAtoms()
+                         .ToSubstructures()
+                         .Count();
+            if (cyclicEtherCount > 1)return "10"; //cyclic ethers
+        } 
         else if (SmartsPattern.Create("C(OC)(OC)[C,H]").Matches(molecule)) return "08"; //hemiacetal poly ethers handled with Ethers in next evaluation
-        else if(SmartsPattern.Create("[c,C]O[C,c]").Matches(molecule))
+        else if(SmartsPattern.Create("[c,C]!@O[C,c]").Matches(molecule))
         {
             int etherSubstrucCount = SmartsPattern.Create("[c,C]O[C,c]")
                          .MatchAll(molecule)
@@ -242,7 +249,7 @@ class Program
             if(etherSubstrucCount > 1) return "08";
             else return "07";         
         }
-        else if(SmartsPattern.Create("[C,c]O").Matches(molecule)) //alchohols
+        else if(SmartsPattern.Create("[C,c]!@O").Matches(molecule)) //alchohols
         {
             int alchoholSubsctructureCount = SmartsPattern.Create("[C,c]O")
                          .MatchAll(molecule)
@@ -258,7 +265,7 @@ class Program
             else if(SmartsPattern.Create("CC(O)C").Matches(molecule)) return"02"; //second
             else return "01"; //must be primary
         }
-        return "EE";
+        return "00";
     }
     static public string CnN_FGEvaluator(string smiles,IAtomContainer molecule)
     {
@@ -268,8 +275,8 @@ class Program
         else if (SmartsPattern.Create("[N-]=[N+]=N[C,c]").Matches(molecule)) return "42"; //azides
         else if
         (
-            SmartsPattern.Create("[C,c]C(=N)N").Matches(molecule) || //amidines
-            SmartsPattern.Create("NC(=N)N").Matches(molecule)        //guanidines
+            SmartsPattern.Create("[C,c]C(=N)[N,n]").Matches(molecule) || //amidines
+            SmartsPattern.Create("[N,n]C(=N)[N,n]").Matches(molecule)    //guanidines
         )return "41";
         
         else if(SmartsPattern.Create("[C,c]N=NC").Matches(molecule)) return "40"; //azo
@@ -324,7 +331,7 @@ class Program
             SmartsPattern.Create("NC[N+](=O)[O-]").Matches(molecule)  ||  //alpha nitro-amine
             SmartsPattern.Create("NCC[N+](=O)[O-]").Matches(molecule) ||  //beta  nitro-amine
             SmartsPattern.Create("NCC[N+](=O)[O-]").Matches(molecule) ||  //gamma nitro-amine
-            SmartsPattern.Create("C#N[!O]").Matches(molecule)                 //nitrile
+            SmartsPattern.Create("C#N[!O]").Matches(molecule)             //nitrile
         ) return "55";
         
         else if (SmartsPattern.Create("[N+](=O)[O-]").Matches(molecule)) return "54"; //nitrated
@@ -343,13 +350,13 @@ class Program
         
         else if (
             SmartsPattern.Create("[C,c]=[N+][O-]").Matches(molecule) || //nitrone
-            SmartsPattern.Create("C#[N+][O-] ").Matches(molecule) ||    //nitrile oxide
-            SmartsPattern.Create("*[N+](*)(*)[O-]").Matches(molecule)  //amine oxide
+            SmartsPattern.Create("C#[N+][O-]").Matches(molecule) ||    //nitrile oxide
+            SmartsPattern.Create("[N+,n+][O-]").Matches(molecule)       //amine oxide
         ) return "50";
         
         else if 
         (
-            SmartsPattern.Create("N=C=O").Matches(molecule) || //isocyanate
+            SmartsPattern.Create("N=C=O").Matches(molecule)    || //isocyanate
             SmartsPattern.Create("O=C=[N-]").Matches(molecule) || //cyanate res
             SmartsPattern.Create("[O+]#C-[N2-]").Matches(molecule) //cyanate res
         ) return "49";
