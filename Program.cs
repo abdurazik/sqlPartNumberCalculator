@@ -82,8 +82,7 @@ class Program
                     {
                         IAtom Carbon1 = substruc.Bonds[0].Atoms[0];
                         IAtom Carbon2 = substruc.Bonds[0].Atoms[1];
-                        if(HydrocarbonChecker(Carbon1,Carbon2,molecule) && 
-                           HydrocarbonChecker(Carbon2,Carbon1,molecule)) return '7';
+                        if(HydrocarbonChecker(Carbon2,Carbon1,molecule)) return '7';
                     }
                 }
                 return '6';
