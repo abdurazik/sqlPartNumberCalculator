@@ -8,8 +8,8 @@ N1C=NC(C=NC=N2)=C12 //purine base
 [N-]=[N+]=NC
 
 41:Amidine/Guanidine
-[C,c]C(=N)N    // Amidines
-NC(=N)N    // Guanidines
+[C,c]C(=N)N // Amidines
+NC(=N)N     // Guanidines
 
 40:Azo (Diazene)
 [C,c]N=NC

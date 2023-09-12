@@ -1,7 +1,7 @@
 CnNO
 
 59:Nucleosides
-O1C([NR,nR,])CCC1  //Lazypattern THF bonded to Nitrogen (alophatic or aromatic) in ring
+O1C([NR,nR])CCC1  //Lazypattern THF bonded to Nitrogen (alophatic or aromatic) in ring
 
 58:Amino Acid Derivatives
 NCC(=O)O[C,c]
@@ -11,6 +11,7 @@ NCC(=O)[O,O-]
 
 56:Carbamic acid/Carbamates/hydrazide
 OC(=O)N // Covers Carbamic acid/Carbamates
+C(=O)NN //hydrazide
 
 55:Nitro amines/amides/nitriles
 NC[N+](=O)[O-] // nitro amines

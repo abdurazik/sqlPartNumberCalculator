@@ -35,8 +35,8 @@ C(=O)[O-].[+1]
 C(=O)O[#1]
 
 20: Hydroxy Ketones //check if gamma needs to be considered
-C(=O)CO[#1]   //alpha
-C(=O)CCO[#1]  //beta
+C(=O)C[OH]   //alpha
+C(=O)CC[OH]  //beta
 
 19: Ketenes
 C=C=O
