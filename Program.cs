@@ -238,8 +238,7 @@ class Program
                           select character).Count();
         if(OxygenCount > 3)
         {
-            Console.WriteLine("[WARNING] Current implementation can't detect Carbohydrates (functional group code:12)");
-            Console.WriteLine("[WARNING] Current implementation can't detect Crown Ethers (functional group code:11)"); 
+           // Handle potential carbohydrate/crown ethers
         }
         
         if(SmartsPattern.Create("C1OC1").Matches(molecule)) return "09"; //epoxides
@@ -509,14 +508,15 @@ class Program
         sw.Stop();
         Console.WriteLine("Chemicals evaluated {0}",lines.Length);
         Console.WriteLine("Finished in {0} seconds",sw.Elapsed.Seconds);
-        Console.WriteLine("{0} chemicals/s",lines.Length/sw.Elapsed.Seconds);
+        Console.WriteLine("{0} chemicals/s",lines.Length/sw.Elapsed.TotalSeconds);
         
         string[] output = new string[calculatedNumbers.Length];
         File.WriteAllText("Benchmark.csv","Partnumber,CalculatedPN");
         for(int i=0;i<calculatedNumbers.Length;i++)
         {
             string line = string.Format("{0},{1}",partNumbers[i],calculatedNumbers[i]);
-            output.Append(line);
+            
+            output[i]=line;
             
         }
         File.AppendAllLines("Benchmark.csv",output);
