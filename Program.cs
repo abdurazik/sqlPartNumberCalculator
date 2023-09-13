@@ -1,12 +1,15 @@
 ﻿namespace CalculateProductNumber;
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.RegularExpressions;
 using MathNet.Numerics;
 using NCDK;
 using NCDK.Aromaticities;
 using NCDK.Graphs;
 using NCDK.Isomorphisms;
+using NCDK.RingSearches;
 using NCDK.SMARTS;
 using NCDK.Smiles;
 
@@ -53,17 +56,17 @@ class Program
     }
     static public char SecondCharachter(string smiles,IAtomContainer molecule)
     {   
-        int cycleCount = Cycles.FindAll(molecule).GetNumberOfCycles();
-        bool isCyclic = cycleCount > 0;
+        
+        bool isCyclic = new Regex(@"(?<![[<#])\d(?!])").IsMatch(smiles);
         if (isCyclic)
         {
             if
             (
                 SmartsPattern.Create("[!CR,!cR;n!v5]").Matches(molecule) && // any cyclic atom not carbon and nitrogen with valence of 5 to handle a weird case
-                !(cycleCount == 1 && SmartsPattern.Create("C1[N,O]C1").Matches(molecule))
+                SmartsPattern.Create("C!@C1@[N,O]@C1!@C").Matches(molecule)
             ) return 'H';
             
-            else if(new Aromaticity(ElectronDonation.PiBondsModel, Cycles.AllSimpleFinder).Apply(molecule))
+            else if(new Aromaticity(ElectronDonation.PiBondsModel, Cycles.EdgeShort).Apply(molecule))
             {
                 if (SmartsPattern.Create("C=C").Matches(molecule)) //alkene
                 {
@@ -416,7 +419,10 @@ class Program
         char secondCharachter ='E';
         string FGCode = "EE";
         
-        IAtomContainer molecule = Chem.MolFromSmiles(smiles);
+        IAtomContainer molecule;
+       
+        molecule = Chem.MolFromSmiles(smiles);
+        
         firstCharachter = FirstCharachter(smiles,molecule);
         secondCharachter = SecondCharachter(smiles,molecule);
         
@@ -471,13 +477,35 @@ class Program
         
         return string.Format("{0}{1}{2}-",firstCharachter,secondCharachter,FGCode);
     }
-    static void Main(string[] args)
+    static public void Benchmark(string[] args)
     {
         string fp = args[0];
         string fileContents = File.ReadAllText(fp);
-        new Regex(@"^(.+),(.+)\n").Matches(fileContents);
+        string[] lines = fileContents.Split("\n");
+        Stopwatch sw = Stopwatch.StartNew();
+        for (int i = 1; i < lines.Length ; i++)
+        {
+            string[] lineSplit = lines[i].Split(",");
+            string partNumber = lineSplit[0];
+            string smiles = lineSplit[1];
+            try
+            {
+                string calcPN = CalculatePN(smiles);
+            }
+            catch (Exception ex) {Console.WriteLine("[EXCEPTION] PartNumber:{0}\nMessage:{1}",partNumber,ex.Message);}
+            if (i % 1000 == 0) Console.WriteLine("{0} molecules processed ; {1} seconds elapsed",i,sw.Elapsed.TotalSeconds);
+        }
+        sw.Stop();
+
+        Console.WriteLine("Chemicals evaluated {0}",lines.Length);
+        Console.WriteLine("Finished in {0} seconds",sw.Elapsed.Seconds);
+        Console.WriteLine("{0} chemicals/s",lines.Length/sw.Elapsed.Seconds);
+    }
+    static async Task Main(string[] args)
+    {
         
         
+        //Console.WriteLine(fileContents);
         //Console.WriteLine(CalculatePN(smiles));
         
     }
