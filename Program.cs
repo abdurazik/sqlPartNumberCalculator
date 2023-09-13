@@ -514,7 +514,7 @@ class Program
         File.WriteAllText("Benchmark.csv","Partnumber,CalculatedPN");
         for(int i=0;i<calculatedNumbers.Length;i++)
         {
-            string line = string.Format("\n{0},{1}",partNumbers[i],calculatedNumbers[i]);
+            string line = string.Format("{0},{1}",partNumbers[i],calculatedNumbers[i]);
             
             output[i]=line;
             
