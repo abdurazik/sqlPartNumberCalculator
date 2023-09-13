@@ -499,7 +499,7 @@ class Program
             }
             catch (Exception ex) 
             {
-                Console.WriteLine("[EXCEPTION] PartNumber:{0}\nMessage:{1}",partNumber,ex.Message);
+                //Console.WriteLine("[EXCEPTION] PartNumber:{0}\nMessage:{1}",partNumber,ex.Message);
                 calculatedNumbers[i] = ex.Message;
             }
             
@@ -507,14 +507,14 @@ class Program
         }
         sw.Stop();
         Console.WriteLine("Chemicals evaluated {0}",lines.Length);
-        Console.WriteLine("Finished in {0} seconds",sw.Elapsed.Seconds);
+        Console.WriteLine("Finished in {0} seconds",sw.Elapsed.TotalSeconds);
         Console.WriteLine("{0} chemicals/s",lines.Length/sw.Elapsed.TotalSeconds);
         
         string[] output = new string[calculatedNumbers.Length];
         File.WriteAllText("Benchmark.csv","Partnumber,CalculatedPN");
         for(int i=0;i<calculatedNumbers.Length;i++)
         {
-            string line = string.Format("{0},{1}",partNumbers[i],calculatedNumbers[i]);
+            string line = string.Format("\n{0},{1}",partNumbers[i],calculatedNumbers[i]);
             
             output[i]=line;
             
