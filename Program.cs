@@ -97,7 +97,8 @@ class Program
                     {
                         IAtom Carbon1 = substruc.Bonds[0].Atoms[0];
                         IAtom Carbon2 = substruc.Bonds[0].Atoms[1];
-                        if(HydrocarbonChecker(Carbon2,Carbon1,molecule)) return '7';
+                        if(Carbon1.IsAromatic)if(HydrocarbonChecker(Carbon2,Carbon1,molecule)) return '7';
+                        else if(HydrocarbonChecker(Carbon1,Carbon2,molecule))return'7';
                     }
                 }
                 return '6';
