@@ -22,19 +22,19 @@ class Program
         bool Other = false; // Sulfur, Boron, Phosphorus
 
         if(
-        new Regex(@"O(?![a-z])").IsMatch(smiles) |
+        new Regex(@"O(?!s])").IsMatch(smiles) ||
         new Regex(@"(?<!\[C)o").IsMatch(smiles)   //for smarts aromatic oxy
         ) containsOxygen = true;
         
         if
         (
-            new Regex(@"N(?![a-z])").IsMatch(smiles) |
+            new Regex(@"N(?![abidph]])").IsMatch(smiles) |
             new Regex(@"(?<!\[C)n").IsMatch(smiles)    //for smarts aromatic nitro
         ) containsNitrogen = true;
         
-        if(new Regex(@"S(?![a-z])").IsMatch(smiles) |
-           new Regex(@"P(?![a-z])").IsMatch(smiles) |
-           new Regex(@"B(?![a-z])").IsMatch(smiles) |
+        if(new Regex(@"S(?![crgnbem])").IsMatch(smiles) |
+           new Regex(@"P(?![ramubod])").IsMatch(smiles) |
+           new Regex(@"B(?![iahrke])").IsMatch(smiles) |
            new Regex(@"(?<!\[C)s").IsMatch(smiles)  | //for smarts aromatic sulfur
            new Regex(@"(?<!\[C)p").IsMatch(smiles)    //for smarts aromatic phosphorus
            ) Other = true;
@@ -63,7 +63,7 @@ class Program
             if
             (
                 SmartsPattern.Create("[!CR,!cR;n!v5]").Matches(molecule) && // any cyclic atom not carbon and nitrogen with valence of 5 to handle a weird case
-                SmartsPattern.Create("C!@C1@[N,O]@C1!@C").Matches(molecule)
+                !SmartsPattern.Create("C!@C1@[N,O]@C1!@C").Matches(molecule)
             ) return 'H';
             
             else if(new Aromaticity(ElectronDonation.PiBondsModel, Cycles.EdgeShort).Apply(molecule))
@@ -91,15 +91,23 @@ class Program
                            HydrocarbonChecker(Carbon2,Carbon1,molecule)) return '9';
                     }
                 } 
-                else if (SmartsPattern.Create("cC").Matches(molecule))//alkane
+                else if (SmartsPattern.Create("[cR][#6]").Matches(molecule))//alkane
                 {
-                     foreach (var substruc in SmartsPattern.Create("cC").MatchAll(molecule).GetUniqueBonds().ToSubstructures())
+                    if(SmartsPattern.Create("cC(F)(F)F").Matches(molecule)) return '8';
+                    //Console.WriteLine("number of substructure {0}",SmartsPattern.Create("c[C;!c][C,H,h]").MatchAll(molecule).GetUniqueBonds().ToSubstructures().Count());
+                    foreach (var substruc in SmartsPattern.Create("cC").MatchAll(molecule).GetUniqueBonds().ToSubstructures())
                     {
                         IAtom Carbon1 = substruc.Bonds[0].Atoms[0];
                         IAtom Carbon2 = substruc.Bonds[0].Atoms[1];
-                        if(Carbon1.IsAromatic)if(HydrocarbonChecker(Carbon2,Carbon1,molecule)) return '7';
-                        else if(HydrocarbonChecker(Carbon1,Carbon2,molecule))return'7';
+                        
+                        if
+                        (
+                            HydrocarbonChecker(Carbon2,Carbon1,molecule) &&
+                            HydrocarbonChecker(Carbon1,Carbon2,molecule)
+                        ) return '7';
+                        
                     }
+                    
                 }
                 return '6';
             }
@@ -128,18 +136,20 @@ class Program
         Queue<IAtom> path = new Queue<IAtom>();
         var atoms = from bond in molecule.GetConnectedBonds(atom1)
                     from atom in bond.Atoms
-                    where !(atom1.Equals(atom)) && !(atom2.Equals(atom))
+                    where !(atom1.Equals(atom)) && !(atom2.Equals(atom)) && !atom.IsAromatic
                     select atom;
         List<IAtom> searched = new List<IAtom>();
         searched.Add(atom1);
         foreach (IAtom atom in atoms) path.Enqueue(atom);
-        
+        //Console.WriteLine("C1 :{0}",atom1);
+        //Console.WriteLine("Queued molecules {0}",path.Count);
         while (path.Count > 0)
         {
             IAtom queuedAtom = path.Dequeue();
             searched.Add(queuedAtom);
+            if (!new Regex(@"C(?![a-z])|F|C(?=l)|B(?=r)|I|H").IsMatch(queuedAtom.Symbol)) return false; //fixes some bug; lazy fix
             
-            
+            //Console.WriteLine("Queued atom: {0}",queuedAtom);
             /* this gets all atoms in bonds not the currently queued atom this will need
             to be further filted for atoms already searched */
             var _atoms = from bond in molecule.GetConnectedBonds(queuedAtom)
@@ -153,7 +163,8 @@ class Program
             {
                 
                 if(_atom.IsAromatic) continue;
-                if (!(new Regex(@"C(?![a-z])|F|C(?=l)|B(?=r)|I|H").IsMatch(_atom.Symbol))) return false; //Check if atom bonded to polyvalents (other than Carbon)
+                //Console.WriteLine("{0}\nElement:{1} ; Aromatic?:{2}",_atom,_atom.Symbol,_atom.IsAromatic);
+                if (!new Regex(@"C(?![a-z])|F|C(?=l)|B(?=r)|I|H").IsMatch(_atom.Symbol)) return false; //Check if atom bonded to polyvalents (other than Carbon)
                 
                 bool Enqueue = true;
                 foreach(var atom in searched) // Check if atom has already been searched
@@ -179,12 +190,12 @@ class Program
     {
         if
         (
-            SmartsPattern.Create("C(=O)C(=O)O").Matches(molecule)   | //alpha keto-acid/ester
-            SmartsPattern.Create("C(=O)CC(=O)O").Matches(molecule)  | //beta keto-acid/ester
-            SmartsPattern.Create("C(=O)CCC(=O)O").Matches(molecule) | //gamma keto-acid/ester
-            SmartsPattern.Create("C([OH])C(=O)O").Matches(molecule) | //alpha hydroxy-acid/ester
-            SmartsPattern.Create("C([OH])CC(=O)O").Matches(molecule)| //beta hydroxy-acid/ester
-            SmartsPattern.Create("C([OH])CCC(=O)O").Matches(molecule) //gamma hydroxy-acid/ester
+            SmartsPattern.Create("[C,c](=O)C(=O)O").Matches(molecule)   | //alpha keto-acid/ester
+            SmartsPattern.Create("[C,c](=O)CC(=O)O").Matches(molecule)  | //beta keto-acid/ester
+            SmartsPattern.Create("[C,c](=O)CCC(=O)O").Matches(molecule) | //gamma keto-acid/ester
+            SmartsPattern.Create("[C,c]([OH])C(=O)O").Matches(molecule) | //alpha hydroxy-acid/ester
+            SmartsPattern.Create("[C,c]([OH])CC(=O)O").Matches(molecule)| //beta hydroxy-acid/ester
+            SmartsPattern.Create("[C,c]([OH])CCC(=O)O").Matches(molecule) //gamma hydroxy-acid/ester
         ) return "29";
 
         else if (SmartsPattern.Create("[C,c](=O)(OC)O[C,c]").Matches(molecule)) return "28"; //carbonates
@@ -210,17 +221,17 @@ class Program
         else if (SmartsPattern.Create("[C,c]=C=O").Matches(molecule)) return "19"; //ketenes
         else if (SmartsPattern.Create("[C,c](=O)[C,c]").Matches(molecule))
         {
-            int uniqueCarbonyls = SmartsPattern.Create("[C,c](=O)[C,c]").
+            int uniqueKetones = SmartsPattern.Create("[C](=O)").
                                                 MatchAll(molecule).
                                                 GetUniqueAtoms().
                                                 ToSubstructures().
                                                 Count();
-            
-            if (uniqueCarbonyls > 1) return "18"; //diketones/polycarbonyl
+            //Console.WriteLine(uniqueKetones);
+            if (uniqueKetones > 1) return "18"; //diketones/polycarbonyl
+            else if(SmartsPattern.Create("[F,Cl,Br,I]C(=O)").Matches(molecule)) return "16"; //acid halides
             else return "17"; //ketone
         }
-        else if(SmartsPattern.Create("C([OH])[OH]").Matches(molecule))return "17" ; //ketone-hydrate (geminal-diol)) return "17";
-        else if(SmartsPattern.Create("[F,Cl,Br,I]C(=O)").Matches(molecule)) return "16"; //acid halides
+        else if(SmartsPattern.Create("C([OH])([OH])[c,c]").Matches(molecule))return "17" ; //ketone-hydrate (geminal-diol)) return "17";
         else if(SmartsPattern.Create("[CH]=O").Matches(molecule)) return "15"; //aldehydes
         else if
         (
@@ -253,7 +264,7 @@ class Program
             if (cyclicEtherCount > 1)return "10"; //cyclic ethers
         } 
         else if (SmartsPattern.Create("C(OC)(OC)[C,H]").Matches(molecule)) return "08"; //hemiacetal poly ethers handled with Ethers in next evaluation
-        else if(SmartsPattern.Create("[c,C]!@O[C,c]").Matches(molecule))
+        else if(SmartsPattern.Create("[c,C]O[C,c]").Matches(molecule))
         {
             int etherSubstrucCount = SmartsPattern.Create("[c,C]O[C,c]")
                          .MatchAll(molecule)
@@ -477,9 +488,8 @@ class Program
         
         return string.Format("{0}{1}{2}-",firstCharachter,secondCharachter,FGCode);
     }
-    static public void Benchmark(string[] args)
+    static public void Benchmark(string fp)
     {
-        string fp = args[0];
         string fileContents = File.ReadAllText(fp);
         string[] lines = fileContents.Split("\n");
         Stopwatch sw = Stopwatch.StartNew();
@@ -501,7 +511,7 @@ class Program
             catch (Exception ex) 
             {
                 //Console.WriteLine("[EXCEPTION] PartNumber:{0}\nMessage:{1}",partNumber,ex.Message);
-                calculatedNumbers[i] = ex.Message;
+                calculatedNumbers[i] = "Could not kekualize structure";
             }
             
             if (i % 10000 == 0) Console.WriteLine("{0} Structures evaluated ; {1} seconds elapsed",i,sw.Elapsed.TotalSeconds);
@@ -526,7 +536,16 @@ class Program
     static void Main(string[] args)
     {
         
-        Benchmark(args);
-        
+        if(args.Contains("-fp"))
+        {
+            string fp = (from str in args    
+                        where str.Contains(".csv")
+                        select str).First();
+            Benchmark(fp);
+        }
+        else
+        {
+            Console.WriteLine(CalculatePN(args[0]));
+        }
     }
 }
