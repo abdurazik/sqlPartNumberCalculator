@@ -483,30 +483,49 @@ class Program
         string fileContents = File.ReadAllText(fp);
         string[] lines = fileContents.Split("\n");
         Stopwatch sw = Stopwatch.StartNew();
+        
+        string[] partNumbers = new string[lines.Length];
+        string[] calculatedNumbers = new string[lines.Length];
+        
         for (int i = 1; i < lines.Length ; i++)
         {
             string[] lineSplit = lines[i].Split(",");
             string partNumber = lineSplit[0];
+            partNumbers[i]= partNumber;
             string smiles = lineSplit[1];
             try
             {
                 string calcPN = CalculatePN(smiles);
+                calculatedNumbers[i] = calcPN;
             }
-            catch (Exception ex) {Console.WriteLine("[EXCEPTION] PartNumber:{0}\nMessage:{1}",partNumber,ex.Message);}
-            if (i % 1000 == 0) Console.WriteLine("{0} molecules processed ; {1} seconds elapsed",i,sw.Elapsed.TotalSeconds);
+            catch (Exception ex) 
+            {
+                Console.WriteLine("[EXCEPTION] PartNumber:{0}\nMessage:{1}",partNumber,ex.Message);
+                calculatedNumbers[i] = ex.Message;
+            }
+            
+            if (i % 10000 == 0) Console.WriteLine("{0} Structures evaluated ; {1} seconds elapsed",i,sw.Elapsed.TotalSeconds);
         }
         sw.Stop();
-
         Console.WriteLine("Chemicals evaluated {0}",lines.Length);
         Console.WriteLine("Finished in {0} seconds",sw.Elapsed.Seconds);
         Console.WriteLine("{0} chemicals/s",lines.Length/sw.Elapsed.Seconds);
+        
+        string[] output = new string[calculatedNumbers.Length];
+        File.WriteAllText("Benchmark.csv","Partnumber,CalculatedPN");
+        for(int i=0;i<calculatedNumbers.Length;i++)
+        {
+            string line = string.Format("{0},{1}",partNumbers[i],calculatedNumbers[i]);
+            output.Append(line);
+            
+        }
+        File.AppendAllLines("Benchmark.csv",output);
+
     }
-    static async Task Main(string[] args)
+    static void Main(string[] args)
     {
         
-        
-        //Console.WriteLine(fileContents);
-        //Console.WriteLine(CalculatePN(smiles));
+        Benchmark(args);
         
     }
 }
