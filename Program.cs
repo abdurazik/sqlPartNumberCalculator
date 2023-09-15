@@ -62,7 +62,7 @@ class Program
         {
             if
             (
-                SmartsPattern.Create("[!CR,!cR;n!v5]").Matches(molecule) && // any cyclic atom not carbon and nitrogen with valence of 5 to handle a weird case
+                SmartsPattern.Create("[!#6R]").Matches(molecule) && // any cyclic atom not carbon and nitrogen with valence of 5 to handle a weird case
                 !SmartsPattern.Create("C!@C1@[N,O]@C1!@C").Matches(molecule)
             ) return 'H';
             
@@ -338,9 +338,9 @@ class Program
         if (SmartsPattern.Create("O1C([NR,nR])CCC1").Matches(molecule)) return "59"; //Nuceleosides
         else if 
         (
-            SmartsPattern.Create("NCC(=O)O[C,c]").Matches(molecule) || //esters amino-acid d.
-            SmartsPattern.Create("NCC(=O)N[C,c]").Matches(molecule) ||  //amide ester amino-acid.
-            SmartsPattern.Create("NCC(=O)N").Matches(molecule)       //amide amino-acid.
+            SmartsPattern.Create("[N,n][C,c][C,c](=O)[N,n][C,c]").Matches(molecule) || //esters amino-acid d.
+            SmartsPattern.Create("[N,n][C,c][C,c](=O)[N,n][C,c]").Matches(molecule) ||  //amide ester amino-acid.
+            SmartsPattern.Create("[N,n][C,c][C,c](=O)[N,n]").Matches(molecule)       //amide amino-acid.
         ) return "58";
         
         else if (SmartsPattern.Create("NCC(=O)[O,O-]").Matches(molecule)) return "57"; // amino-acid/salt
@@ -488,64 +488,6 @@ class Program
         
         return string.Format("{0}{1}{2}-",firstCharachter,secondCharachter,FGCode);
     }
-    static public void Benchmark(string fp)
-    {
-        string fileContents = File.ReadAllText(fp);
-        string[] lines = fileContents.Split("\n");
-        Stopwatch sw = Stopwatch.StartNew();
-        
-        string[] partNumbers = new string[lines.Length];
-        string[] calculatedNumbers = new string[lines.Length];
-        
-        for (int i = 1; i < lines.Length ; i++)
-        {
-            string[] lineSplit = lines[i].Split(",");
-            string partNumber = lineSplit[0];
-            partNumbers[i]= partNumber;
-            string smiles = lineSplit[1];
-            try
-            {
-                string calcPN = CalculatePN(smiles);
-                calculatedNumbers[i] = calcPN;
-            }
-            catch (Exception ex) 
-            {
-                //Console.WriteLine("[EXCEPTION] PartNumber:{0}\nMessage:{1}",partNumber,ex.Message);
-                calculatedNumbers[i] = "Could not kekualize structure";
-            }
-            
-            if (i % 10000 == 0) Console.WriteLine("{0} Structures evaluated ; {1} seconds elapsed",i,sw.Elapsed.TotalSeconds);
-        }
-        sw.Stop();
-        Console.WriteLine("Chemicals evaluated {0}",lines.Length);
-        Console.WriteLine("Finished in {0} seconds",sw.Elapsed.TotalSeconds);
-        Console.WriteLine("{0} chemicals/s",lines.Length/sw.Elapsed.TotalSeconds);
-        
-        string[] output = new string[calculatedNumbers.Length];
-        File.WriteAllText("Benchmark.csv","Partnumber,CalculatedPN");
-        for(int i=0;i<calculatedNumbers.Length;i++)
-        {
-            string line = string.Format("{0},{1}",partNumbers[i],calculatedNumbers[i]);
-            
-            output[i]=line;
-            
-        }
-        File.AppendAllLines("Benchmark.csv",output);
+    
 
-    }
-    static void Main(string[] args)
-    {
-        
-        if(args.Contains("-fp"))
-        {
-            string fp = (from str in args    
-                        where str.Contains(".csv")
-                        select str).First();
-            Benchmark(fp);
-        }
-        else
-        {
-            Console.WriteLine(CalculatePN(args[0]));
-        }
-    }
 }
