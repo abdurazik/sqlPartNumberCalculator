@@ -63,7 +63,7 @@ class Program
             if
             (
                 SmartsPattern.Create("[!#6R]").Matches(molecule) && // any cyclic atom not carbon and nitrogen with valence of 5 to handle a weird case
-                !SmartsPattern.Create("C!@C1@[N,O]@C1!@C").Matches(molecule)
+                !SmartsPattern.Create("C1[N,O]C1").Matches(molecule)
             ) return 'H';
             
             else if(new Aromaticity(ElectronDonation.PiBondsModel, Cycles.EdgeShort).Apply(molecule))
@@ -219,9 +219,9 @@ class Program
         ) return "20"; //hydroxy ketones
         
         else if (SmartsPattern.Create("[C,c]=C=O").Matches(molecule)) return "19"; //ketenes
-        else if (SmartsPattern.Create("[C,c](=O)[C,c]").Matches(molecule))
+        else if (SmartsPattern.Create("[C,c]C(=O)[C,c]").Matches(molecule))
         {
-            int uniqueKetones = SmartsPattern.Create("[C](=O)").
+            int uniqueKetones = SmartsPattern.Create("[C,c]C(=O)[C,c]").
                                                 MatchAll(molecule).
                                                 GetUniqueAtoms().
                                                 ToSubstructures().
@@ -326,10 +326,10 @@ class Program
         
         else if (SmartsPattern.Create("[C,c]=N").Matches(molecule))return "35"; //imines
         else if(SmartsPattern.Create("[C,c]1N[C,c]1").Matches(molecule))return "34"; //aziridines
-        else if(SmartsPattern.Create("*[N+](*)(*)*").Matches(molecule))return "33"; //ammonium
-        else if(SmartsPattern.Create("[C]!@N([C])[C]").Matches(molecule))return "32"; //tertiary amines
-        else if(SmartsPattern.Create("[C]!@N[C]").Matches(molecule))return "31"; //secondary amines
-        else if(SmartsPattern.Create("[C,c]!@N").Matches(molecule))return "30";
+        else if(SmartsPattern.Create("[!C][N+]([!C])([!C])[!C]").Matches(molecule))return "33"; //ammonium
+        else if(SmartsPattern.Create("[C]N([C,n,N])[C]").Matches(molecule))return "32"; //tertiary amines
+        else if(SmartsPattern.Create("[C]N[C]").Matches(molecule))return "31"; //secondary amines
+        else if(SmartsPattern.Create("CN").Matches(molecule))return "30";
         else if(SmartsPattern.Create("n").Matches(molecule)) return "00";
         return "EE";
     }
@@ -353,7 +353,7 @@ class Program
         
         else if 
         (
-            SmartsPattern.Create("NC[N+](=O)[O-]").Matches(molecule)  ||  //alpha nitro-amine
+            SmartsPattern.Create("N[C,c][c,C][N+](=O)[O-]").Matches(molecule)  ||  //alpha nitro-amine
             SmartsPattern.Create("NCC[N+](=O)[O-]").Matches(molecule) ||  //beta  nitro-amine
             SmartsPattern.Create("NCC[N+](=O)[O-]").Matches(molecule) ||  //gamma nitro-amine
             SmartsPattern.Create("C#N[!O]").Matches(molecule)             //nitrile

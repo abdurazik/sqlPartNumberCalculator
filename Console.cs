@@ -33,6 +33,16 @@ class ConsoleApp
             int errorCount = 0;
             while ((line = reader.ReadLine()) != null)
             {
+                if(difsBufferBytes >= 3500)
+                {
+                    Task.WhenAll(difsTasks).Wait();
+                    difs.Flush();
+                }
+                if(matchesBufferBytes >= 3500)
+                {
+                    Task.WhenAll(matchTasks).Wait();
+                    matches.Flush();
+                }
                 
                 string[] _s = line.Split(",");
                 string pn = _s[0];
@@ -58,7 +68,7 @@ class ConsoleApp
                     errorCount ++;
                     string errorMsg = ex.Message.Replace("\n",";");
                     
-                    errors.WriteLineAsync(string.Format("{0},{1}\n",pn,errorMsg));
+                    errors.WriteLine(string.Format("{0},{1}",pn,errorMsg));
                     matchesBufferBytes += (pn.Length + 2 + errorMsg.Length) * sizeof(char);
                 }
                 if (i++ % 20000 == 0) Console.WriteLine("PROCESSED {0} MOLECULES IN {1} SECONDS",i,sw.Elapsed.TotalSeconds);
