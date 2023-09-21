@@ -6,6 +6,18 @@ using Microsoft.VisualBasic;
 
 class ConsoleApp
 {
+    static void Help()
+    {
+        Console.WriteLine("Help for calcPN:");
+        Console.WriteLine("SYNTAX: \"calcPN [arg] [val]\"");
+        Console.WriteLine("args:");
+        Console.WriteLine("-s\tComputes partnumber for single smiles string. (eg. -s \"CCOC\")");
+        Console.WriteLine("-f\tExpects path to a file with a list of JUST smiles strings, each smiles needs to be on its own line");
+        Console.WriteLine("NOTE: if no arg is applied, this is the default applied routine");
+        Console.WriteLine("-b\tCalls benchmark routine, input being a csv. (eg. -b \"test.csv\")");
+        Console.WriteLine("NOTE: csv must have the structure \"PN,smiles\"");
+        Console.WriteLine("Created by Abdurazik Abdurazik employee of SynquestLaboratories 2023");
+    }
     static public async Task BenchMark(string fp)
     {
         
@@ -81,10 +93,43 @@ class ConsoleApp
             Console.WriteLine("{0} Sturctures processed in {1} seconds processing at {2} molecules/s",i,sw.Elapsed.TotalSeconds,i/sw.Elapsed.TotalSeconds);
         }
     }
+    static void CalculatePartNumbers(string fp)
+    {
+        using (StreamWriter @out = new StreamWriter("partnumbers.txt"))
+        using (StreamWriter errors = new StreamWriter("errors.txt"))
+        {
+            StreamReader reader = new StreamReader(fp);
+            string smiles;
+            int line =1;
+            while ((smiles = reader.ReadLine()) != null)
+            {
+                line++;
+                try
+                {
+                    string pn = Program.CalculatePN(smiles);
+                    @out.WriteLine(pn);
+                }
+                catch (Exception e)
+                {
+                    errors.WriteLine("[ERROR] LineNumber:{0} Message:{1}",line,e.Message);
+                }
+            }
+            reader.Close();
+        }
+    }
     public static async Task Main(string[] args)
     {
         if (args.Contains("-s")) Console.WriteLine(Program.CalculatePN(args[1]));
         else if(args.Contains("-b")) await BenchMark(args[1]);
-        
+        else if(args.Contains("-f")) CalculatePartNumbers(args[1]);
+        else
+        {
+            try {CalculatePartNumbers(args[0]);}
+            catch (Exception e)
+            {
+                Console.WriteLine("[ERROR] : {0}",e.Message);
+                Help();
+            }
+        }
     }
 }
