@@ -16,7 +16,7 @@ class ConsoleApp
         Console.WriteLine("NOTE: if no arg is applied, this is the default applied routine");
         Console.WriteLine("-b\tCalls benchmark routine, input being a csv. (eg. -b \"test.csv\")");
         Console.WriteLine("NOTE: csv must have the structure \"PN,smiles\"");
-        Console.WriteLine("NOTE: outputs as tab-delimated file for easy copy pasting unto Excel.")
+        Console.WriteLine("NOTE: outputs as tab-delimated file for easy copy pasting unto Excel.");
         Console.WriteLine("Created by Abdurazik Abdurazik employee of SynquestLaboratories 2023");
     }
     static public async Task BenchMark(string fp)
