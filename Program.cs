@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using MathNet.Numerics;
 using NCDK;
 using NCDK.Aromaticities;
+using NCDK.Formula;
 using NCDK.Graphs;
 using NCDK.Isomorphisms;
 using NCDK.RingSearches;
@@ -421,6 +422,80 @@ class Program
     {
         return "EE";
     }
+    static public string FifthCharachter(string formula)
+    {
+        bool Hydrogenated = false;
+        bool Fluorinated = false;
+        bool Chlorinated = false;
+        bool Brominated = false;
+        bool Iodated = false;
+
+        if (new Regex("H(?![a-z])").IsMatch(formula)) Hydrogenated = true;
+        if (new Regex("F(?![a-z])").IsMatch(formula)) Fluorinated = true;
+        if (formula.Contains("Cl")) Chlorinated = true;
+        if (formula.Contains("Br")) Brominated = true;
+        if (new Regex("I(?![a-z])").IsMatch(formula)) Iodated = true;
+
+        if (Fluorinated)
+        {
+            if (Iodated)
+            {
+                if (Hydrogenated && Chlorinated && Brominated) return "Y-"; 
+                else if (Chlorinated && Brominated) return "X-"; 
+                else if (Hydrogenated && Brominated) return "U-"; 
+                else if (Brominated ) return "T-"; 
+                else if (Hydrogenated && Chlorinated ) return "P-"; 
+                else if (Chlorinated) return "N-"; 
+                else if (Hydrogenated ) return "K-"; 
+                else return "J-"; 
+            }
+            else if (Brominated)
+            {
+                if (Hydrogenated && Chlorinated && Brominated) return "F-"; 
+                else if (Chlorinated && Brominated) return "E-"; 
+                else if (Hydrogenated && Brominated) return "B-"; 
+                else return "A-"; 
+            }
+            if (Chlorinated)
+            {
+                if (Hydrogenated && Chlorinated) return "7-"; 
+                else return "6-"; 
+            }
+            if (Hydrogenated) return "3-"; 
+            return "2-"; 
+        }
+        else if (Chlorinated)
+        {
+            if (Iodated)
+            {
+                if(Brominated && Hydrogenated) return "W-";
+                if(Brominated) return "V-";
+                else if (Hydrogenated) return "M-";
+                else return "L-";
+            }
+            else if (Brominated)
+            {
+                if (Hydrogenated) return "D-";
+                else return "C-";
+            } 
+            else if (Hydrogenated) return "5-";
+            else return "4-";
+        }
+        else if (Brominated)
+        {
+            if (Iodated && Hydrogenated) return "S-";
+            else if (Iodated) return "R-";
+            else if (Hydrogenated) return "9-";
+            else return "8-";
+        }
+        else if (Iodated)
+        {
+            if (Hydrogenated) return "H-";
+            else return "G-";
+        }
+        else if (Hydrogenated) return "1-";
+        else return "0-";
+    }
     static public string CalculatePN(string smiles)
     {
 
@@ -433,7 +508,6 @@ class Program
         IAtomContainer molecule;
        
         molecule = Chem.MolFromSmiles(smiles);
-        
         firstCharachter = FirstCharachter(smiles,molecule);
         secondCharachter = SecondCharachter(smiles,molecule);
         

@@ -12,7 +12,7 @@ class ConsoleApp
         Console.WriteLine("SYNTAX: \"calcPN [arg] [val]\"");
         Console.WriteLine("args:");
         Console.WriteLine("-s\tComputes partnumber for single smiles string. (eg. -s \"CCOC\")");
-        Console.WriteLine("-f\tExpects path to a file with a list of JUST smiles strings, each smiles needs to be on its own line");
+        Console.WriteLine("-f\tExpects path to a file in csv format \"smiles,molecular formular\"");
         Console.WriteLine("NOTE: if no arg is applied, this is the default applied routine");
         Console.WriteLine("-b\tCalls benchmark routine, input being a csv. (eg. -b \"test.csv\")");
         Console.WriteLine("NOTE: csv must have the structure \"PN,smiles\"");
@@ -65,13 +65,13 @@ class ConsoleApp
                     calculatedPN = Program.CalculatePN(smiles);
                     if (!pn.Contains(calculatedPN)) 
                     {
-                        difsTasks.Add(difs.WriteLineAsync(string.Format("{0},{1},{2}",pn,calculatedPN,smiles)));
+                        difsTasks.Add(difs.WriteLineAsync(string.Format("{0}\t{1}\t{2}",pn,calculatedPN,smiles)));
                         difCount ++;
                     }
                     else
                     {
                         matchCount ++;
-                        matchTasks.Add(matches.WriteAsync(string.Format("{0},{1}\n",pn,calculatedPN)));
+                        matchTasks.Add(matches.WriteAsync(string.Format("{0}\t{1}",pn,calculatedPN)));
                         matchesBufferBytes += (pn.Length + 2 + calculatedPN.Length) * sizeof(Char); 
                     }
                 }
@@ -80,7 +80,7 @@ class ConsoleApp
                     errorCount ++;
                     string errorMsg = ex.Message.Replace("\n",";");
                     
-                    errors.WriteLine(string.Format("{0},{1}",pn,errorMsg));
+                    errors.WriteLine(string.Format("{0}\t{1}",pn,errorMsg));
                     matchesBufferBytes += (pn.Length + 2 + errorMsg.Length) * sizeof(char);
                 }
                 if (i++ % 20000 == 0) Console.WriteLine("PROCESSED {0} MOLECULES IN {1} SECONDS",i,sw.Elapsed.TotalSeconds);
@@ -100,14 +100,20 @@ class ConsoleApp
         {
             StreamReader reader = new StreamReader(fp);
             string smiles;
+            string formula;
+            string linestr;
             int line =1;
-            while ((smiles = reader.ReadLine()) != null)
+            while ((linestr = reader.ReadLine()) != null)
             {
                 line++;
+                string[] splitLine = linestr.Split(",");
+                smiles = splitLine[0];
+                formula = splitLine[1];
                 try
                 {
                     string pn = Program.CalculatePN(smiles);
-                    @out.WriteLine(pn);
+                    pn += Program.FifthCharachter(formula);
+                    @out.WriteLine(string.Format("{0}\t{1}\t{2}",smiles,formula,pn));
                 }
                 catch (Exception e)
                 {
@@ -127,7 +133,7 @@ class ConsoleApp
             try {CalculatePartNumbers(args[0]);}
             catch (Exception e)
             {
-                Console.WriteLine("[ERROR] : {0}",e.Message);
+                Console.WriteLine("[ERROR] : Please ensure this is a valid csv without headers with structure \"SMILES,Formula\" for calculation");
                 Help();
             }
         }
