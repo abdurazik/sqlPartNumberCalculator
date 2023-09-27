@@ -58,7 +58,9 @@ class Program
         else if(Other && containsCarbon) return '5';
         else if (containsCarbon) 
         {
-            // TODO add checks for inorganics
+            if (new Regex(@"Sc|Ti|V|Cr|Mn|Fe|Co|Ni|Cu|Zn|Y|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|Hf|Ta|W|Re|Os|Ir|Pt|Au|Hg|Rf|Db|Sg|Bh|Hs").IsMatch(smiles)) return '9'; //Transition metals
+            else if (new Regex(@"La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu").IsMatch(smiles)) return '9'; //Lanthanides
+            else if (new Regex(@"Ac|Th|Pa|U|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr").IsMatch(smiles)) return '9'; //Actinides
             return '1';
         }
         else return 'M';
