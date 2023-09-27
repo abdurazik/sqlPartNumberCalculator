@@ -56,8 +56,12 @@ class Program
             else return '3';
         }
         else if(Other && containsCarbon) return '5';
-        else if (containsCarbon) return '1';
-        return 'E'; 
+        else if (containsCarbon) 
+        {
+            // TODO add checks for inorganics
+            return '1';
+        }
+        else return 'M';
     }
     static public char SecondCharachter(string smiles,IAtomContainer molecule)
     {   
@@ -609,6 +613,7 @@ class Program
                 break;
             
             case 'M':
+                secondCharachter = '0';
                 FGCode = "EE";
                 break;
             
