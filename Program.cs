@@ -25,10 +25,8 @@ class Program
         bool containsNitrogen = false;
         bool Other = false; // Sulfur, Boron, Phosphorus
 
-        if (SmartsPattern.Create("[C,c][Li,Na,K,Rb,Cs,Fr,Be,Mg,Ca,Sr,Ba,Ra]").Matches(molecule)) return '9';
-        else if (new Regex(@"Sc|Ti|V|Cr|Mn|Fe|Co|Ni|Cu|Zn|Y|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|Hf|Ta|W|Re|Os|Ir|Pt|Au|Hg|Rf|Db|Sg|Bh|Hs").IsMatch(smiles)) return '9'; //Transition metals
-        else if (new Regex(@"La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu").IsMatch(smiles)) return '9'; //Lanthanides
-        else if (new Regex(@"Ac|Th|Pa|U|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr").IsMatch(smiles)) return '9'; //Actinides
+        if (SmartsPattern.Create("[C,c][Li,Na,K,Rb,Cs,Fr,Be,Mg,Ca,Sr,Ba,Ra,Ge,As,Sb,Te,Al,Ga,In,Sn,Tl,Pb,Bi,Po,At]").Matches(molecule)) return '9';
+        
        
         
         if(
@@ -65,6 +63,9 @@ class Program
         else if(Other && containsCarbon) return '5';
         else if (containsCarbon) 
         {
+            if (new Regex(@"Sc|Ti|V|Cr|Mn|Fe|Co|Ni|Cu|Zn|Y|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|Hf|Ta|W|Re|Os|Ir|Pt|Au|Hg|Rf|Db|Sg|Bh|Hs").IsMatch(smiles)) return '9'; //Transition metals
+            else if (new Regex(@"La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu").IsMatch(smiles)) return '9'; //Lanthanides
+            else if (new Regex(@"Ac|Th|Pa|U|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr").IsMatch(smiles)) return '9'; //Actinides
             
             return '1';
         }
@@ -586,8 +587,8 @@ class Program
                 {
                     if (SmartsPattern.Create("[N!R,n!R]").Matches(molecule))
                     {
-                        FGCode = CnN_FGEvaluator(smiles,molecule);
-                        if(FGCode == "00" || FGCode == "EE") FGCode = CnNO_FGEvaluator(smiles,molecule);        
+                        FGCode = CnNO_FGEvaluator(smiles,molecule);
+                        if(FGCode == "00" || FGCode == "EE") FGCode = CnN_FGEvaluator(smiles,molecule);        
                     }
                     else if (SmartsPattern.Create("[O!R,o!R]").Matches(molecule))
                     {
