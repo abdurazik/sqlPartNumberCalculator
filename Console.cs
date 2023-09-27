@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using CalculateProductNumber;
 using Microsoft.VisualBasic;
+using NCDK.Charges;
 
 
 
@@ -12,19 +13,20 @@ class ConsoleApp
         Console.WriteLine("SYNTAX: \"calcPN [arg] [val]\"");
         Console.WriteLine("args:");
         Console.WriteLine("-s\tComputes partnumber for single smiles string. (eg. -s \"CCOC\")");
-        Console.WriteLine("-f\tExpects path to a file in csv format \"smiles,molecular formular\"");
+        Console.WriteLine("-f\tExpects path to a file where each SMILES string occupies its own line. Output is tab seperated \"SMILES(tab)PartNumber\"");
         Console.WriteLine("NOTE: if no arg is applied, this is the default applied routine");
         Console.WriteLine("-b\tCalls benchmark routine, input being a csv. (eg. -b \"test.csv\")");
-        Console.WriteLine("NOTE: csv must have the structure \"PN,smiles\"");
-        Console.WriteLine("NOTE: outputs as tab-delimated file for easy copy pasting unto Excel.");
+        Console.WriteLine("NOTE: csv must have the structure \"PN,smiles\" AND of structure \"PartNumber,SMILES\" WITHOUT headers.");
+        Console.WriteLine("");
+        Console.WriteLine("NOTE: outputs as tab-delimated");
         Console.WriteLine("Created by Abdurazik Abdurazik employee of SynquestLaboratories 2023");
     }
     static public async Task BenchMark(string fp)
     {
-        
-        using (StreamWriter matches = new StreamWriter("match.csv"))
-        using (StreamWriter difs = new StreamWriter("dif.csv"))
-        using (StreamWriter errors = new StreamWriter("error.csv"))
+        Directory.CreateDirectory("Benchmark");
+        using (StreamWriter matches = new StreamWriter("Benchmark/match.txt"))
+        using (StreamWriter difs = new StreamWriter("Benchmark/dif.txt"))
+        using (StreamWriter errors = new StreamWriter("Benchmark/error.txt"))
         {
             
             List<Task> matchTasks = new List<Task>();
@@ -36,7 +38,7 @@ class ConsoleApp
             
             Stopwatch sw = new Stopwatch();
             StreamReader reader = new StreamReader(fp);
-            reader.ReadLine(); // skip headers
+            
             string line;
             sw.Start();
             
@@ -72,7 +74,7 @@ class ConsoleApp
                     else
                     {
                         matchCount ++;
-                        matchTasks.Add(matches.WriteAsync(string.Format("{0}\t{1}",pn,calculatedPN)));
+                        matchTasks.Add(matches.WriteLineAsync(string.Format("{0}\t{1}",pn,calculatedPN)));
                         matchesBufferBytes += (pn.Length + 2 + calculatedPN.Length) * sizeof(Char); 
                     }
                 }
@@ -100,25 +102,19 @@ class ConsoleApp
         using (StreamWriter errors = new StreamWriter("errors.txt"))
         {
             StreamReader reader = new StreamReader(fp);
-            string smiles;
-            string formula;
-            string linestr;
+            string? smiles;
             int line =1;
-            while ((linestr = reader.ReadLine()) != null)
+            while ((smiles = reader.ReadLine()) != null)
             {
                 line++;
-                string[] splitLine = linestr.Split(",");
-                smiles = splitLine[0];
-                formula = splitLine[1];
                 try
                 {
                     string pn = Program.CalculatePN(smiles);
-                    pn += Program.FifthCharachter(formula);
-                    @out.WriteLine(string.Format("{0}\t{1}\t{2}",smiles,formula,pn));
+                    @out.WriteLine(string.Format("{0}\t{1}",smiles,pn));
                 }
                 catch (Exception e)
                 {
-                    errors.WriteLine("[ERROR] LineNumber:{0} Message:{1}",line,e.Message);
+                    errors.WriteLine("[ERROR] LineNumber:{0} Message: {1}",line,e.Message);
                 }
             }
             reader.Close();
@@ -132,12 +128,17 @@ class ConsoleApp
         else
         {
             if (args.Length > 0)
-            try {CalculatePartNumbers(args[0]);}
-            catch (Exception e)
             {
-                Console.WriteLine("[ERROR] : Please ensure this is a valid csv without headers with structure \"SMILES,Formula\" for calculation");
+                
+            try {CalculatePartNumbers(args[0]);}
+            catch 
+            {
+                Console.WriteLine("[ERROR] : Please check file, Smiles strings must be delimited by new line.");
+                Console.WriteLine("###");
                 Help();
             }
+            }
+            else Help();
         }
     }
 }
