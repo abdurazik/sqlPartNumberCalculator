@@ -79,7 +79,7 @@ class Program
         {
             if
             (
-                SmartsPattern.Create("[C,c]@[!#6]@[C,c]@[C,c]").Matches(molecule) 
+                SmartsPattern.Create("[C,c]@[!#6]@[*]@[*").Matches(molecule) 
             ) return 'H';
             
             else if(new Aromaticity(ElectronDonation.PiBondsModel, Cycles.EdgeShort).Apply(molecule))
