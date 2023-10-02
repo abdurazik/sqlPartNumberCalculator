@@ -46,7 +46,7 @@ class Program
            new Regex(@"(?<!\[C)s").IsMatch(smiles)  | //for smarts aromatic sulfur
            new Regex(@"(?<!\[C)p").IsMatch(smiles)    //for smarts aromatic phosphorus
            ) Other = true;
-        if (new Regex(@"(?<!\[)C(?=[A-Zcno.\()])|c(?!\])").IsMatch(smiles)) containsCarbon = true;
+        if (new Regex(@"(?<=[a-z\]])C(?=[A-Zcno.\(\)\s])|(?<=[a-z\]])c(?=[A-Zcno.\(\)\s])").IsMatch(smiles)) containsCarbon = true;
         
         if(containsOxygen && containsCarbon)
         {
@@ -63,10 +63,7 @@ class Program
         else if(Other && containsCarbon) return '5';
         else if (containsCarbon) 
         {
-            if (new Regex(@"Sc|Ti|V|Cr|Mn|Fe|Co|Ni|Cu|Zn|Y|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|Hf|Ta|W|Re|Os|Ir|Pt|Au|Hg|Rf|Db|Sg|Bh|Hs").IsMatch(smiles)) return '9'; //Transition metals
-            else if (new Regex(@"La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu").IsMatch(smiles)) return '9'; //Lanthanides
-            else if (new Regex(@"Ac|Th|Pa|U|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr").IsMatch(smiles)) return '9'; //Actinides
-            
+            if (SmartsPattern.Create("C[!C,!c]").Matches(molecule)) return '9';
             return '1';
         }
         else return 'M';
@@ -665,6 +662,7 @@ class Program
                 }
                 if (FGCodeint <= 9) FGCode = string.Format("0{0}",FGCodeint);
                 else FGCode = FGCodeint.ToString();
+                
                 break;
             
             default:
