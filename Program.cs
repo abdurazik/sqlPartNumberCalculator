@@ -40,13 +40,13 @@ class Program
             new Regex(@"(?<!\[C)n").IsMatch(smiles)    //for smarts aromatic nitro
         ) containsNitrogen = true;
         
-        if(new Regex(@"S(?![crgnbem])").IsMatch(smiles) |
+        if(new Regex(@"S(?![rgnbem]|c\])").IsMatch(smiles) |
            new Regex(@"P(?![ramubod])").IsMatch(smiles) |
            new Regex(@"B(?![iahrke])").IsMatch(smiles) |
            new Regex(@"(?<!\[C)s").IsMatch(smiles)  | //for smarts aromatic sulfur
            new Regex(@"(?<!\[C)p").IsMatch(smiles)    //for smarts aromatic phosphorus
            ) Other = true;
-        if (new Regex(@"(?<!\[)C(?=[A-Zcno.])|c(?!\])").IsMatch(smiles)) containsCarbon = true;
+        if (new Regex(@"(?<!\[)C(?=[A-Zcno.\()])|c(?!\])").IsMatch(smiles)) containsCarbon = true;
         
         if(containsOxygen && containsCarbon)
         {
@@ -79,7 +79,7 @@ class Program
         {
             if
             (
-                SmartsPattern.Create("[C,c]@[!#6]@[*]@[*").Matches(molecule) 
+                SmartsPattern.Create("[C,c]@[!#6]@[*]@[*]").Matches(molecule) 
             ) return 'H';
             
             else if(new Aromaticity(ElectronDonation.PiBondsModel, Cycles.EdgeShort).Apply(molecule))
@@ -282,7 +282,7 @@ class Program
             if(etherSubstrucCount > 1) return "08";
             else return "07";         
         }
-        else if(SmartsPattern.Create("[C,c]!@O").Matches(molecule)) //alchohols
+        else if(SmartsPattern.Create("[C,c,n]!@O").Matches(molecule)) //alchohols
         {
             int alchoholSubsctructureCount = SmartsPattern.Create("[C,c]O")
                          .MatchAll(molecule)
@@ -293,9 +293,9 @@ class Program
             else if(alchoholSubsctructureCount ==2) return "04"; //diols
 
             //If only one alchohol present
-            else if(SmartsPattern.Create("cO").Matches(molecule)) return "01"; //weird rule, alchohols bonded to aromatic ring are regarded as primary. Legacy convention
             else if(SmartsPattern.Create("C(O)(C)(C)C").Matches(molecule)) return"03"; //tert
             else if(SmartsPattern.Create("CC(O)C").Matches(molecule)) return"02"; //second
+            else if(SmartsPattern.Create("[c,n]O").Matches(molecule)) return "01"; //weird rule, alchohols bonded to aromatic ring are regarded as primary. Legacy convention
             else return "01"; //must be primary
         }
         return "00";
@@ -311,7 +311,7 @@ class Program
                 .ToSubstructures()
                 .Count();
         if(etherSubstrucCount > 1) return "08";
-        else if (SmartsPattern.Create("[c,C][O][C,c]").Matches(molecule)) return "07";
+        else if (SmartsPattern.Create("[c,C]!@[O]!@[C,c]").Matches(molecule)) return "07";
 
 
         
@@ -326,9 +326,9 @@ class Program
             else if(alchoholSubsctructureCount ==2) return "04"; //diols
 
             //If only one alchohol present
-            else if(SmartsPattern.Create("c[OH]").Matches(molecule)) return "01"; //weird rule, alchohols bonded to aromatic ring are regarded as primary. Legacy convention
             else if(SmartsPattern.Create("C([OH])(C)(C)C").Matches(molecule)) return"03"; //tert
             else if(SmartsPattern.Create("CC([OH])C").Matches(molecule)) return"02"; //second
+            else if(SmartsPattern.Create("[c,n][OH]").Matches(molecule)) return "01"; //weird rule, alchohols bonded to aromatic ring are regarded as primary. Legacy convention
             else if (SmartsPattern.Create("C[OH]").Matches(molecule)) return "01"; //must be primary
         }
         return "10";
@@ -368,9 +368,9 @@ class Program
         else if (SmartsPattern.Create("C=N").Matches(molecule))return "35"; //imines
         else if(SmartsPattern.Create("[C,c]1N[C,c]1").Matches(molecule))return "34"; //aziridines
         else if(SmartsPattern.Create("[!C][N+]([!C])([!C])[!C]").Matches(molecule))return "33"; //ammonium
-        else if(SmartsPattern.Create("[C,c]N([C,c])[C,c]").Matches(molecule))return "32"; //tertiary amines
-        else if(SmartsPattern.Create("[C,c]N[C,c]").Matches(molecule))return "31"; //secondary amines
-        else if(SmartsPattern.Create("[C,c]N").Matches(molecule))return "30";
+        else if(SmartsPattern.Create("[C,c]!@N(!@[C,c])[C,c]").Matches(molecule))return "32"; //tertiary amines
+        else if(SmartsPattern.Create("[C,c]!@N!@[C,c]").Matches(molecule))return "31"; //secondary amines
+        else if(SmartsPattern.Create("[C,c]!@N(!@C)!@C").Matches(molecule))return "30";
         
         return "EE";
     }
@@ -387,7 +387,8 @@ class Program
         (
             SmartsPattern.Create("[O,o]C(=O)[N,n]").Matches(molecule) || //carbamate
             SmartsPattern.Create("C(=O)NN").Matches(molecule) || //hydrazide
-            SmartsPattern.Create("[OH]CCN").Matches(molecule)
+            SmartsPattern.Create("O!=CN").Matches(molecule) ||
+            SmartsPattern.Create("ocn").Matches(molecule)
         ) return "56"; //Carbamates
         
         else if 
@@ -431,7 +432,7 @@ class Program
         
         else if 
         (
-            SmartsPattern.Create("C(=O)N").Matches(molecule)  ||  //amide
+            SmartsPattern.Create("[C,c](=[O,o])[N,n]").Matches(molecule)  ||  //amide
             SmartsPattern.Create("N@C(=O)").Matches(molecule) ||  //lactam
             SmartsPattern.Create("C(=O)CN").Matches(molecule) ||  //alpha amino-ketone
             SmartsPattern.Create("C(=O)CCN").Matches(molecule) || //beta amino-ketone
@@ -556,6 +557,7 @@ class Program
         char firstCharachter = 'E';
         char secondCharachter ='E';
         string FGCode = "EE";
+        int FGCodeint = 0; //used only for PN's that start with 9 or M
         string fifthCharachter = "E-";
         
         
@@ -578,26 +580,51 @@ class Program
             
             case '3':
                 FGCode = CnN_FGEvaluator(smiles,molecule);
-                if (FGCode == "EE") FGCode = "32";
+                if (FGCode == "EE") 
+                {
+                    if 
+                    (
+                        SmartsPattern.Create("n").Matches(molecule) ||
+                        SmartsPattern.Create("C@N(C)@C").Matches(molecule) 
+                    ) FGCode =  "32";
+                    else FGCode = "31";
+                }
                 break;
             
             case '4':
                 FGCode = CnNO_FGEvaluator(smiles,molecule);
                 if (secondCharachter == 'H')
                 {
-                    if (SmartsPattern.Create("[N!R,n!R]").Matches(molecule))
-                    {
-                        FGCode = CnNO_FGEvaluator(smiles,molecule);
-                        if(FGCode == "00" || FGCode == "EE") FGCode = CnN_FGEvaluator(smiles,molecule);        
-                    }
-                    else if (SmartsPattern.Create("[O!R,o!R]").Matches(molecule))
+                    if(FGCode == "00" || FGCode == "EE") FGCode = CnN_FGEvaluator(smiles,molecule);        
+                    
+                    if 
+                    (
+                        SmartsPattern.Create("O1C([NR,nR])CCC1").Matches(molecule) &&
+                        (FGCode == "00" || FGCode == "EE")
+                    ) FGCode = "59";
+                    if 
+                    (
+                        SmartsPattern.Create("[O!R,o!r]").Matches(molecule) &&
+                        (FGCode == "00" || FGCode == "EE")
+                    )
                     {
                         FGCode = CnO_FGEvaluator(smiles,molecule);
                     }
-                    else return "32";
+                    if (FGCode == "00" || FGCode == "EE")
+                    {
+                         if 
+                        (
+                            SmartsPattern.Create("n").Matches(molecule) ||
+                            SmartsPattern.Create("C@N(C)@C").Matches(molecule) 
+                        ) FGCode =  "32";
+                        else FGCode = "31";
+                    }
                 }
-                if(FGCode == "EE") FGCode = CnN_FGEvaluator(smiles,molecule);
-                if(FGCode == "00" || FGCode == "EE") FGCode = CnO_FGEvaluator(smiles,molecule);
+                else
+                {
+                    if (FGCode == "00" || FGCode == "EE") FGCode = CnN_FGEvaluator(smiles,molecule);
+                }
+                
                 break;
             
             case '5':
@@ -617,12 +644,27 @@ class Program
                 break;
             
             case '9':
-                FGCode = "EE";
+                foreach (var atom in molecule.Atoms)
+                {
+                    if (atom.AtomicNumber != 6)
+                    {
+                        if (atom.AtomicNumber > FGCodeint) FGCodeint = atom.AtomicNumber;
+                    }
+                }
+                if (FGCodeint <= 9) FGCode = string.Format("0{0}",FGCodeint);
+                else FGCode = FGCodeint.ToString();
                 break;
             
             case 'M':
-                secondCharachter = '0';
-                FGCode = "EE";
+                foreach (var atom in molecule.Atoms)
+                {
+                    if (atom.AtomicNumber != 6)
+                    {
+                        if (atom.AtomicNumber > FGCodeint) FGCodeint = atom.AtomicNumber;
+                    }
+                }
+                if (FGCodeint <= 9) FGCode = string.Format("0{0}",FGCodeint);
+                else FGCode = FGCodeint.ToString();
                 break;
             
             default:

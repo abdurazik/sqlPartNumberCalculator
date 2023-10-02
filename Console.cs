@@ -12,11 +12,11 @@ class ConsoleApp
         Console.WriteLine("Help for calcPN:");
         Console.WriteLine("SYNTAX: \"calcPN [arg] [val]\"");
         Console.WriteLine("args:");
-        Console.WriteLine("-s\tComputes partnumber for single smiles string. (eg. -s \"CCOC\")");
+        Console.WriteLine("-s\tComputes partnumber for single SMILES string. (eg. -s \"CCOC\")");
         Console.WriteLine("-f\tExpects path to a file where each SMILES string occupies its own line. Output is tab seperated \"SMILES(tab)PartNumber\"");
         Console.WriteLine("NOTE: if no arg is applied, this is the default applied routine");
         Console.WriteLine("-b\tCalls benchmark routine, input being a csv. (eg. -b \"test.csv\")");
-        Console.WriteLine("NOTE: csv must have the structure \"PN,smiles\" AND of structure \"PartNumber,SMILES\" WITHOUT headers.");
+        Console.WriteLine("NOTE: csv must have the structure \"PN,SMILES\" WITHOUT headers. Output is tab seperated \"SMILES(tab)PN\"");
         Console.WriteLine("");
         Console.WriteLine("NOTE: outputs as tab-delimated");
         Console.WriteLine("Created by Abdurazik Abdurazik employee of SynquestLaboratories 2023");
