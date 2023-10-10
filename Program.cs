@@ -36,7 +36,7 @@ class Program
         
         if
         (
-            new Regex(@"N(?![abidph]])").IsMatch(smiles) |
+            new Regex(@"N(?![abidph])").IsMatch(smiles) |
             new Regex(@"(?<!\[C)n").IsMatch(smiles)    //for smarts aromatic nitro
         ) containsNitrogen = true;
         
@@ -46,7 +46,7 @@ class Program
            new Regex(@"(?<!\[C)s").IsMatch(smiles)  | //for smarts aromatic sulfur
            new Regex(@"(?<!\[C)p").IsMatch(smiles)    //for smarts aromatic phosphorus
            ) Other = true;
-        if (new Regex(@"(?<=[a-z\]])C(?=[A-Zcno.\(\)\s])|(?<=[a-z\]])c(?=[A-Zcno.\(\)\s])").IsMatch(smiles)) containsCarbon = true;
+        if (new Regex(@"(?<=[\)\(\.A-Za-z\]1-9=#@]|^)C(?=[A-Zcno\(\)\\[@#\s=1-9]|$)|(?<=[\)\(\.A-Za-z\]1-9@]|^)c(?=[A-Zcno\(\)\@s1-9]|$)").IsMatch(smiles)) containsCarbon = true;
         
         if(containsOxygen && containsCarbon)
         {
@@ -63,7 +63,6 @@ class Program
         else if(Other && containsCarbon) return '5';
         else if (containsCarbon) 
         {
-            if (SmartsPattern.Create("C[!C,!c]").Matches(molecule)) return '9';
             return '1';
         }
         else return 'M';
@@ -71,8 +70,7 @@ class Program
     static public char SecondCharachter(string smiles,IAtomContainer molecule)
     {   
         
-        bool isCyclic = new Regex(@"(?<![[<#])\d(?!])").IsMatch(smiles);
-        if (isCyclic)
+        if (SmartsPattern.Create("*@*@*@*@*").Matches(molecule)) //CYCLIC
         {
             if
             (
@@ -222,7 +220,7 @@ class Program
         )return "24"; //TODO:Check double bond on ester side
         
         else if(SmartsPattern.Create("C(=O)O[C,c]").Matches(molecule)) return "23"; //esters
-        else if (SmartsPattern.Create("C(=O)[O-].[+1]").Matches(molecule)) return "22"; //carboxylates
+        else if (SmartsPattern.Create("C(=O)[O].[*+]").Matches(molecule)) return "22"; //carboxylates
         else if(SmartsPattern.Create("C(=O)[OH]").Matches(molecule)) return "21"; //carboxylic acids
         else if
         (
@@ -245,18 +243,18 @@ class Program
             else return "17"; //ketone
         }
         else if(SmartsPattern.Create("C([OH])([OH])[c,c]").Matches(molecule))return "17" ; //ketone-hydrate (geminal-diol)) return "17";
-        else if(SmartsPattern.Create("[CH]=O").Matches(molecule)) return "15"; //aldehydes
+        else if
+        (
+            SmartsPattern.Create("[CH]=O").Matches(molecule) |
+            SmartsPattern.Create("[CH2]=O").Matches(molecule)
+        ) return "15"; //aldehydes
         else if
         (
             SmartsPattern.Create("O-O").Matches(molecule) |
             SmartsPattern.Create("*[O+](*)*").Matches(molecule)
         ) return "14"; //peroxides/oxonium
         
-        else if 
-        (
-            SmartsPattern.Create("[O-][F,Cl,Br,I]").Matches(molecule)|      //Hypophalite
-            SmartsPattern.Create("C([OH])C[F,Cl,Br,I]").Matches(molecule)  //halohydrin
-        ) return "13";
+        else if (SmartsPattern.Create("[O-][F,Cl,Br,I]").Matches(molecule)) return "13"; //hypophalite
 
         int OxygenCount = (from character in smiles
                           where character == 'O'
@@ -342,7 +340,7 @@ class Program
             SmartsPattern.Create("[N,n]C(=N)[N,n]").Matches(molecule)    //guanidines
         )return "41";
         
-        else if(SmartsPattern.Create("[C,c]N=NC").Matches(molecule)) return "40"; //azo
+        else if(SmartsPattern.Create("[C,c]1N=N1").Matches(molecule)) return "40"; //azo
         else if
         (
             SmartsPattern.Create("N-N").Matches(molecule) ||     //Hydrazine
@@ -367,7 +365,7 @@ class Program
         else if(SmartsPattern.Create("[!C][N+]([!C])([!C])[!C]").Matches(molecule))return "33"; //ammonium
         else if(SmartsPattern.Create("[C,c]!@N(!@[C,c])[C,c]").Matches(molecule))return "32"; //tertiary amines
         else if(SmartsPattern.Create("[C,c]!@N!@[C,c]").Matches(molecule))return "31"; //secondary amines
-        else if(SmartsPattern.Create("[C,c]!@N(!@C)!@C").Matches(molecule))return "30";
+        else if(SmartsPattern.Create("[C,c][NH2]").Matches(molecule))return "30";
         
         return "EE";
     }
@@ -376,7 +374,7 @@ class Program
         if (SmartsPattern.Create("O1C([NR,nR])CCC1").Matches(molecule)) return "59"; //Nuceleosides
         else if 
         (
-           SmartsPattern.Create("N").Matches(molecule) &&
+           SmartsPattern.Create("C-N").Matches(molecule) &&
            SmartsPattern.Create("[C,c][C,c](=O)O").Matches(molecule)
         ) return aminoAcidHandler(smiles,molecule); 
         
@@ -458,8 +456,8 @@ class Program
     {
         if 
         (
-            SmartsPattern.Create("[C,c][NH][!#1]").Matches(molecule)||
-            SmartsPattern.Create("[C,c]N([!#1])[!#1]").Matches(molecule)
+            SmartsPattern.Create("[C,c]-[NH][!#1]").Matches(molecule)||
+            SmartsPattern.Create("[C,c]-N([!#1])[!#1]").Matches(molecule)
         ) return "58";
         else if 
         (
@@ -594,11 +592,6 @@ class Program
                 {
                     if(FGCode == "00" || FGCode == "EE") FGCode = CnN_FGEvaluator(smiles,molecule);        
                     
-                    if 
-                    (
-                        SmartsPattern.Create("O1C([NR,nR])CCC1").Matches(molecule) &&
-                        (FGCode == "00" || FGCode == "EE")
-                    ) FGCode = "59";
                     if 
                     (
                         SmartsPattern.Create("[O!R,o!r]").Matches(molecule) &&
