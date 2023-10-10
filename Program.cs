@@ -46,7 +46,7 @@ class Program
            new Regex(@"(?<!\[C)s").IsMatch(smiles)  | //for smarts aromatic sulfur
            new Regex(@"(?<!\[C)p").IsMatch(smiles)    //for smarts aromatic phosphorus
            ) Other = true;
-        if (new Regex(@"(?<=[\)\(\.A-Za-z\]1-9=#@]|^)C(?=[A-Zcno\(\)\\[@#\s=1-9]|$)|(?<=[\)\(\.A-Za-z\]1-9@]|^)c(?=[A-Zcno\(\)\@s1-9]|$)").IsMatch(smiles)) containsCarbon = true;
+        if (new Regex(@"(?<=[\)\(\.A-Za-z\]1-9=#@]|^)C(?=[\]A-Zcno\(\)\\[@#\s=1-9]|$)").IsMatch(smiles)) containsCarbon = true;
         
         if(containsOxygen && containsCarbon)
         {
