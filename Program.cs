@@ -25,7 +25,7 @@ class Program
         bool containsNitrogen = false;
         bool Other = false; // Sulfur, Boron, Phosphorus
 
-        if (SmartsPattern.Create("[C,c][Li,Na,K,Rb,Cs,Fr,Be,Mg,Ca,Sr,Ba,Ra,Ge,As,Sb,Te,Al,Ga,In,Sn,Tl,Pb,Bi,Po,At]").Matches(molecule)) return '9';
+        if (SmartsPattern.Create("[C,c,N,n,O,o][!#5;!#6;!#7;!#8;!#9;!#17;!#35;!#53;!#14;!#15;!#16;!#17;!#1]").Matches(molecule)) return '9';
         
        
         
@@ -37,16 +37,18 @@ class Program
         if
         (
             new Regex(@"N(?![abidph])").IsMatch(smiles) |
-            new Regex(@"(?<!\[C)n").IsMatch(smiles)    //for smarts aromatic nitro
+            new Regex(@"(?<!\[[A-Z])n").IsMatch(smiles)    //for smarts aromatic nitro
         ) containsNitrogen = true;
         
-        if(new Regex(@"S(?![rgnbem]|c\])").IsMatch(smiles) |
+        if(
+           smiles.Contains("Si")|
+           new Regex(@"S(?![rgnbem]|c\])").IsMatch(smiles) |
            new Regex(@"P(?![ramubod])").IsMatch(smiles) |
            new Regex(@"B(?![iahrke])").IsMatch(smiles) |
            new Regex(@"(?<!\[C)s").IsMatch(smiles)  | //for smarts aromatic sulfur
            new Regex(@"(?<!\[C)p").IsMatch(smiles)    //for smarts aromatic phosphorus
            ) Other = true;
-        if (new Regex(@"(?<=[\)\(\.A-Za-z\]1-9=#@]|^)C(?=[\]A-Zcno\(\)\\[@#\s=1-9]|$)").IsMatch(smiles)) containsCarbon = true;
+        if (new Regex(@"(?<=[\)\(\.A-Za-z\]1-9=#@]|^)C(?=[\]A-Zcno\(\)\\[@#\s=1-9]|$)|(?<=[\)\(\.A-Za-z\]1-9=#@]|^)c(?=[\]A-Zcno\(\)\\[@#\s=1-9]|$)").IsMatch(smiles)) containsCarbon = true;
         
         if(containsOxygen && containsCarbon)
         {
@@ -70,11 +72,15 @@ class Program
     static public char SecondCharachter(string smiles,IAtomContainer molecule)
     {   
         
-        if (SmartsPattern.Create("*@*@*@*@*").Matches(molecule)) //CYCLIC
+        if 
+        (
+            SmartsPattern.Create("*@*@*@*").Matches(molecule) |
+            SmartsPattern.Create("C1CC1").Matches(molecule)
+        ) //CYCLIC
         {
             if
             (
-                SmartsPattern.Create("[C,c]@[!#6]@[*]@[*]").Matches(molecule) 
+                SmartsPattern.Create("*@[*R1]@[!#6]@[*R1]@*").Matches(molecule) 
             ) return 'H';
             
             else if(new Aromaticity(ElectronDonation.PiBondsModel, Cycles.EdgeShort).Apply(molecule))
@@ -468,6 +474,97 @@ class Program
     }
     static public string Cn_OthersEvaluator(string smiles, IAtomContainer molecule)
     {
+        if (smiles.Contains("Si")) return Cn_OtherSilicon(smiles,molecule);
+        else if 
+        (
+            new Regex(@"P(?![ramubod])").IsMatch(smiles) ||
+            new Regex(@"(?<!\[C)p").IsMatch(smiles)
+        ) return Cn_OtherPhosphorus(smiles,molecule);
+
+        else if 
+        (
+            new Regex(@"S(?![rgnbem]|c\])").IsMatch(smiles) ||
+            new Regex(@"(?<!\[C)s").IsMatch(smiles)
+        ) return Cn_OtherSulfur(smiles,molecule);
+        
+        else if (new Regex(@"B(?![iahrke])").IsMatch(smiles)) return "60";
+        else return "EE";
+    }
+    static public string Cn_OtherSilicon(string smiles, IAtomContainer molecule)
+    {
+        if 
+        (
+            SmartsPattern.Create("C(=O)N[Si]").Matches(molecule)|
+            SmartsPattern.Create("C=N[Si]").Matches(molecule)   |
+            SmartsPattern.Create("[Si]C=N ").Matches(molecule)  |
+            SmartsPattern.Create("[Si]C=NO").Matches(molecule)
+        ) return "89";
+        
+        else if (SmartsPattern.Create("[Si]N[Si]").Matches(molecule)) return "88";
+        else if (new Regex(@"N(?![abidph])").IsMatch(smiles) | new Regex(@"(?<!\[C)n").IsMatch(smiles)) return "87";
+        else if (SmartsPattern.Create("C(=O)O[Si]").Matches(molecule)) return "86";
+        else if (SmartsPattern.Create("[Si]O[Si]").Matches(molecule)) return "85";
+        else if (SmartsPattern.Create("[Si][O,o][c,n,o]").Matches(molecule)) return "84";
+        else if (SmartsPattern.Create("[Si][O,o][C,c]").Matches(molecule)) return "83";
+        else if (SmartsPattern.Create("[Si][OH]").Matches(molecule)) return "82";
+        else if (SmartsPattern.Create("[Si][F,Cl,Br,I]").Matches(molecule)) return "81";
+        else if (SmartsPattern.Create("*[Si](*)(*)*").Matches(molecule)) return "80";
+        return "EE";
+    }
+    static public string Cn_OtherPhosphorus(string smiles,IAtomContainer molecule)
+    {
+        if 
+        (
+            SmartsPattern.Create("*-[P,p](=[N,n])(-*)-*").Matches(molecule) ||
+            SmartsPattern.Create("[S,O]=PN").Matches(molecule)
+        ) return "79";
+
+        else if (SmartsPattern.Create("c1ccccc1P(c1ccccc1)(c1ccccc1)=C ").Matches(molecule)) return "78";
+        else if (SmartsPattern.Create("P(=O)(-[O,o]*)(-[o,O]*)[!#8]").Matches(molecule)) return "77";
+        else if (SmartsPattern.Create("[Pv4+]").Matches(molecule)) return "76";
+        else if (SmartsPattern.Create("P(=O)(-[O-])(-[O-])[!#8]").Matches(molecule)) return "75";
+        else if 
+        (
+            SmartsPattern.Create("O=P(-*)(-*)(-*)").Matches(molecule) |
+            SmartsPattern.Create("O[PX3](O)O").Matches(molecule)
+        ) return "74";
+        else if (SmartsPattern.Create("[PX3][F,Cl,Br,I]").Matches(molecule)) return "73";
+        else if (SmartsPattern.Create("[PX3]").Matches(molecule)) return "72";
+        return "EE";
+    }
+    static public string Cn_OtherSulfur(string smiles,IAtomContainer molecule)
+    {
+        if (SmartsPattern.Create("[F,Cl,Br,I]S([F,Cl,Br,I])([F,Cl,Br,I])([F,Cl,Br,I])[F,Cl,Br,I]").Matches(molecule)) return "71";
+        else if 
+        (
+            SmartsPattern.Create("*@[S,s]").Matches(molecule) &&
+            SmartsPattern.Create("*@[!#6,!#16]").Matches(molecule)
+        ) return "70";
+
+        else if 
+        (
+            SmartsPattern.Create("S(=O)(=[O,N])N").Matches(molecule) ||
+            SmartsPattern.Create("S(=O)(=O)NS(=O)(=O)").Matches(molecule)
+        ) return "69";
+
+        else if 
+        (
+            SmartsPattern.Create("S=C=N").Matches(molecule) ||
+            SmartsPattern.Create("SC#N").Matches(molecule)
+        ) return "68";
+        
+        else if (SmartsPattern.Create("S=C").Matches(molecule)) return "67";
+        else if (SmartsPattern.Create("[S,s][S,s]").Matches(molecule)) return "66";
+        else if (SmartsPattern.Create("[SX3](=O)O").Matches(molecule)) return "65";
+        else if (SmartsPattern.Create("[SX4](=O)(=O)[O,o]").Matches(molecule)) return "64";
+        else if (SmartsPattern.Create("[C,c][SX4](=O)(=O)[C,c]").Matches(molecule)) return "63";
+        else if 
+        (
+            SmartsPattern.Create("[SX4](=O)=O").Matches(molecule) ||
+            SmartsPattern.Create("S[F,Cl,Br,I]").Matches(molecule)
+        ) return "62";
+        else if (SmartsPattern.Create("[SX2H]").Matches(molecule)) return "61";
+        else if (SmartsPattern.Create("[C,c][SX2][C,c]").Matches(molecule)) return "66";
         return "EE";
     }
     static public string FifthCharachter(string formula)
@@ -613,49 +710,61 @@ class Program
                 else
                 {
                     if (FGCode == "00" || FGCode == "EE") FGCode = CnN_FGEvaluator(smiles,molecule);
+                    else if (FGCode == "00" || FGCode == "EE") FGCode = CnO_FGEvaluator(smiles,molecule);
                 }
                 
                 break;
             
             case '5':
-                FGCode = "EE";
-                break;
-            
             case '6':
-                FGCode = "EE";
-                break;
-            
             case '7':
-                FGCode = "EE";
-                break;
-            
             case '8':
-                FGCode = "EE";
+                FGCode = Cn_OthersEvaluator(smiles,molecule);
                 break;
             
             case '9':
-                foreach (var atom in molecule.Atoms)
-                {
-                    if (atom.AtomicNumber != 6)
-                    {
-                        if (atom.AtomicNumber > FGCodeint) FGCodeint = atom.AtomicNumber;
-                    }
-                }
-                if (FGCodeint <= 9) FGCode = string.Format("0{0}",FGCodeint);
-                else FGCode = FGCodeint.ToString();
-                break;
-            
             case 'M':
+                int largestAN = 0;
+                int largestHalogen = 0;
                 foreach (var atom in molecule.Atoms)
                 {
-                    if (atom.AtomicNumber != 6)
+                    if 
+                    (
+                        atom.AtomicNumber != 6 &&
+                        atom.AtomicNumber != 9 &&
+                        atom.AtomicNumber != 17 &&
+                        atom.AtomicNumber != 35 &&
+                        atom.AtomicNumber != 53
+                    )
                     {
-                        if (atom.AtomicNumber > FGCodeint) FGCodeint = atom.AtomicNumber;
+                        if (atom.AtomicNumber > largestAN) largestAN = atom.AtomicNumber;
                     }
+
+                    else if 
+                    (
+                        atom.AtomicNumber == 9  ||
+                        atom.AtomicNumber == 17 ||
+                        atom.AtomicNumber == 35 ||
+                        atom.AtomicNumber == 53
+                    )
+                    {
+                        if (atom.AtomicNumber > largestHalogen) largestHalogen = atom.AtomicNumber;
+                    }
+                    
+                    
+
                 }
-                if (FGCodeint <= 9) FGCode = string.Format("0{0}",FGCodeint);
-                else FGCode = FGCodeint.ToString();
                 
+                if (largestAN == 1)
+                    {
+                        if (largestHalogen.ToString().Length == 1) FGCode = string.Format("0{0}",largestHalogen);
+                        else FGCode = largestHalogen.ToString();
+                    }
+                    else
+                    {
+                        if (largestAN.ToString().Length == 1) FGCode = string.Format("0{0}",largestAN);
+                        else FGCode = largestAN.ToString();
+                    }
                 break;
             
             default:

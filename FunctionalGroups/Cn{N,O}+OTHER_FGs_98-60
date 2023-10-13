@@ -25,7 +25,7 @@ NCCC[Si]  //gamma
 C(=O)O[Si]
 
 85:[Si]loxane
-[Si]O[Si]
+[Si][O,o][Si]
 
 84:Aryloxysilane
 [Si]O[c,n,o]
@@ -53,16 +53,16 @@ c1ccccc1P(c1ccccc1)(c1ccccc1)=C        //ylide
 //TODO PHOSPHORANES
 
 77:Phosphonate
-P(=O)(OC)(OC)C
+P(=O)(-[O,o])(-[o,O])[C,c]
 
 76:Phosphonium
-*-[P+](-*)(-*)-*
+[Pv4+]
 
 75:Phosphates
 OP(=O)(O)O
 
 74:Phosphite/phosphine oxide //I've seen halogen bonded to phosphorus double check this
-O=P([H])(OC)(OC)
+O=P(-*)(-*)(-*)
 COP(OC)OC
 
 73:Halophosphines
@@ -84,7 +84,7 @@ COP(OC)OC
 
 69:Sulfonamide / Sulfonimide / amino-sulfur . Ammonium sulfur salts
 S(=O)(=O)N   //Sulfonamide
-S(=O)(=O)N=C //Sulfonimide
+S(=O)(=O)NS(=O)(=O) //Sulfonimide
 // TODO amino-sulfur & Ammonium sulfur
 
 68:Thiocyanate / Isothiocyante
