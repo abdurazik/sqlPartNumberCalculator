@@ -719,6 +719,7 @@ class Program
             
             case '9':
             case 'M':
+                if (firstCharachter == 'M') secondCharachter = '0';
                 int largestAN = 0;
                 int largestHalogen = 0;
                 foreach (var atom in molecule.Atoms)
