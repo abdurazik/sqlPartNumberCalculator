@@ -18,7 +18,7 @@ using NCDK.Smiles;
 
 class Program
 {
-    static public char FirstCharachter(string smiles, IAtomContainer molecule)
+    static public char FirstCharachter(string smiles,string formula,IAtomContainer molecule)
     {
         bool containsCarbon = false;
         bool containsOxygen = false;
@@ -27,8 +27,6 @@ class Program
 
         if (SmartsPattern.Create("[C,c,N,n,O,o][!#5;!#6;!#7;!#8;!#9;!#17;!#35;!#53;!#14;!#15;!#16;!#17;!#1]").Matches(molecule)) return '9';
         
-        string inchi = Chem.MolToInChI(molecule);
-        string formula = inchi.Split("/")[1];
         
         if(new Regex(@"O(?![a-z])").IsMatch(formula) ) containsOxygen = true;
         if(new Regex(@"N(?![a-z])").IsMatch(formula) ) containsNitrogen = true;
@@ -75,7 +73,7 @@ class Program
         {
             if
             (
-                SmartsPattern.Create("*@[*]@[!#6]@[*]@*").Matches(molecule) 
+                SmartsPattern.Create("*@[!#6]@*@*").Matches(molecule) 
             ) return 'H';
             
             else if(new Aromaticity(ElectronDonation.PiBondsModel, Cycles.EdgeShort).Apply(molecule))
@@ -290,7 +288,7 @@ class Program
 
             //If only one alchohol present
             else if(SmartsPattern.Create("C(O)(C)(C)C").Matches(molecule)) return"03"; //tert
-            else if(SmartsPattern.Create("CC(O)C").Matches(molecule)) return"02"; //second
+            else if(SmartsPattern.Create("[C,c]C(O)[C,c]").Matches(molecule)) return"02"; //second
             else if(SmartsPattern.Create("[c,n]O").Matches(molecule)) return "01"; //weird rule, alchohols bonded to aromatic ring are regarded as primary. Legacy convention
             else return "01"; //must be primary
         }
@@ -551,8 +549,8 @@ class Program
         else if (SmartsPattern.Create("S=C").Matches(molecule)) return "67";
         else if (SmartsPattern.Create("[S,s][S,s]").Matches(molecule)) return "66";
         else if (SmartsPattern.Create("[SX3](=O)O").Matches(molecule)) return "65";
-        else if (SmartsPattern.Create("[SX4](=O)(=O)[O,o]").Matches(molecule)) return "64";
-        else if (SmartsPattern.Create("[C,c][SX4](=O)(=O)[C,c]").Matches(molecule)) return "63";
+        else if (SmartsPattern.Create("[SX4](=O)(=O)([O,o])([C,H,O])").Matches(molecule)) return "64";
+        else if (SmartsPattern.Create("C[SX4](=O)(=O)C").Matches(molecule)) return "63";
         else if 
         (
             SmartsPattern.Create("[SX4](=O)=O").Matches(molecule) ||
@@ -651,7 +649,7 @@ class Program
         IAtomContainer molecule = Chem.MolFromSmiles(smiles);
         string inchi = Chem.MolToInChI(molecule);
         string formula = inchi.Split("/")[1];
-        firstCharachter = FirstCharachter(smiles,molecule);
+        firstCharachter = FirstCharachter(smiles,formula,molecule);
         secondCharachter = SecondCharachter(smiles,molecule);
         fifthCharachter = FifthCharachter(formula);
         
