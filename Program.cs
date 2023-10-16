@@ -27,28 +27,23 @@ class Program
 
         if (SmartsPattern.Create("[C,c,N,n,O,o][!#5;!#6;!#7;!#8;!#9;!#17;!#35;!#53;!#14;!#15;!#16;!#17;!#1]").Matches(molecule)) return '9';
         
-       
+        string inchi = Chem.MolToInChI(molecule);
+        string formula = inchi.Split("/")[1];
         
-        if(
-        new Regex(@"O(?!s])").IsMatch(smiles) ||
-        new Regex(@"(?<!\[C)o").IsMatch(smiles)   //for smarts aromatic oxy
-        ) containsOxygen = true;
-        
-        if
-        (
-            new Regex(@"N(?![abidph])").IsMatch(smiles) |
-            new Regex(@"(?<!\[[A-Z])n").IsMatch(smiles)    //for smarts aromatic nitro
-        ) containsNitrogen = true;
+        if(new Regex(@"O(?![a-z])").IsMatch(formula) ) containsOxygen = true;
+        if(new Regex(@"N(?![a-z])").IsMatch(formula) ) containsNitrogen = true;
         
         if(
            smiles.Contains("Si")|
-           new Regex(@"S(?![rgnbem]|c\])").IsMatch(smiles) |
-           new Regex(@"P(?![ramubod])").IsMatch(smiles) |
-           new Regex(@"B(?![iahrke])").IsMatch(smiles) |
-           new Regex(@"(?<!\[C)s").IsMatch(smiles)  | //for smarts aromatic sulfur
-           new Regex(@"(?<!\[C)p").IsMatch(smiles)    //for smarts aromatic phosphorus
+           new Regex(@"S(?![a-z])").IsMatch(formula) |
+           new Regex(@"P(?![a-z])").IsMatch(formula) |
+           new Regex(@"B(?![a-z])").IsMatch(formula)   
+           //for smarts aromatic sulfur
            ) Other = true;
-        if (new Regex(@"(?<=[\)\(\.A-Za-z\]1-9=#@]|^)C(?=[\]A-Zcno\(\)\\[@#\s=1-9]|$)|(?<=[\)\(\.A-Za-z\]1-9=#@]|^)c(?=[\]A-Zcno\(\)\\[@#\s=1-9]|$)").IsMatch(smiles)) containsCarbon = true;
+        if 
+        (
+            new Regex(@"C(?![a-z])").IsMatch(formula) 
+        ) containsCarbon = true;
         
         if(containsOxygen && containsCarbon)
         {
@@ -80,7 +75,7 @@ class Program
         {
             if
             (
-                SmartsPattern.Create("*@[*R1]@[!#6]@[*R1]@*").Matches(molecule) 
+                SmartsPattern.Create("*@[*]@[!#6]@[*]@*").Matches(molecule) 
             ) return 'H';
             
             else if(new Aromaticity(ElectronDonation.PiBondsModel, Cycles.EdgeShort).Apply(molecule))
@@ -226,7 +221,7 @@ class Program
         )return "24"; //TODO:Check double bond on ester side
         
         else if(SmartsPattern.Create("C(=O)O[C,c]").Matches(molecule)) return "23"; //esters
-        else if (SmartsPattern.Create("C(=O)[O].[*+]").Matches(molecule)) return "22"; //carboxylates
+        else if (SmartsPattern.Create("C(=O)[O-]").Matches(molecule)) return "22"; //carboxylates
         else if(SmartsPattern.Create("C(=O)[OH]").Matches(molecule)) return "21"; //carboxylic acids
         else if
         (
