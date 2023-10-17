@@ -122,7 +122,16 @@ class ConsoleApp
     }
     public static async Task Main(string[] args)
     {
-        if (args.Contains("-s")) Console.WriteLine(Program.CalculatePN(args[1]));
+        if (args.Contains("-s")) 
+        {
+            try {Program.CalculatePN(args[1]);}
+            catch 
+            {
+                Console.WriteLine("Please check smiles string, could not parse");
+                Help();
+            } 
+            
+        }
         else if(args.Contains("-b")) await BenchMark(args[1]);
         else if(args.Contains("-f")) CalculatePartNumbers(args[1]);
         else
