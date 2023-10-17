@@ -124,10 +124,11 @@ class ConsoleApp
     {
         if (args.Contains("-s")) 
         {
-            try {Program.CalculatePN(args[1]);}
+            try {Console.WriteLine(Program.CalculatePN(args[1]));}
             catch 
             {
-                Console.WriteLine("Please check smiles string, could not parse");
+                Console.WriteLine("[ERROR] Please check smiles string, could not parse");
+                Console.WriteLine("");
                 Help();
             } 
             
