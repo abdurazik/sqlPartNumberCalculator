@@ -4,7 +4,7 @@ CnNO
 O1C([NR,nR])CCC1  //Lazypattern THF bonded to Nitrogen (alophatic or aromatic) in ring
 
 58:Amino Acid Derivatives
-NCC(=O)O[C,c]
+[N,n]CC(=O)O[C,c]
 
 57:Amino Acid and their salts
 NCC(=O)[O,O-]

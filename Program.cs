@@ -16,7 +16,7 @@ using NCDK.RingSearches;
 using NCDK.SMARTS;
 using NCDK.Smiles;
 
-class Program
+public partial class SynquestPartnumberCalculator
 {
     static public char FirstCharachter(string smiles,string formula,IAtomContainer molecule)
     {

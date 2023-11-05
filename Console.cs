@@ -65,7 +65,7 @@ class ConsoleApp
                 string calculatedPN;
                 try
                 {
-                    calculatedPN = Program.CalculatePN(smiles);
+                    calculatedPN = SynquestPartnumberCalculator.CalculatePN(smiles);
                     if (!pn.Contains(calculatedPN)) 
                     {
                         difsTasks.Add(difs.WriteLineAsync(string.Format("{0}\t{1}\t{2}",pn,calculatedPN,smiles)));
@@ -109,7 +109,7 @@ class ConsoleApp
                 line++;
                 try
                 {
-                    string pn = Program.CalculatePN(smiles);
+                    string pn = SynquestPartnumberCalculator.CalculatePN(smiles);
                     @out.WriteLine(string.Format("{0}\t{1}",smiles,pn));
                 }
                 catch (Exception e)
@@ -124,7 +124,7 @@ class ConsoleApp
     {
         if (args.Contains("-s")) 
         {
-            try {Console.WriteLine(Program.CalculatePN(args[1]));}
+            try {Console.WriteLine(SynquestPartnumberCalculator.CalculatePN(args[1]));}
             catch 
             {
                 Console.WriteLine("[ERROR] Please check smiles string, could not parse");
