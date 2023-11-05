@@ -515,11 +515,11 @@ public partial class SynquestPartnumberCalculator
         else if (SmartsPattern.Create("c1ccccc1P(c1ccccc1)(c1ccccc1)=C ").Matches(molecule)) return "78";
         else if (SmartsPattern.Create("P(=O)(-[O,o]*)(-[o,O]*)[!#8]").Matches(molecule)) return "77";
         else if (SmartsPattern.Create("[Pv4+]").Matches(molecule)) return "76";
-        else if (SmartsPattern.Create("P(=O)(-[O-])(-[O-])[!#8]").Matches(molecule)) return "75";
+        else if (SmartsPattern.Create("P(=O)(-O)(-O)O").Matches(molecule)) return "75";
         else if 
         (
-            SmartsPattern.Create("O=P(-*)(-*)(-*)").Matches(molecule) |
-            SmartsPattern.Create("O[PX3](O)O").Matches(molecule)
+            SmartsPattern.Create("O=P([H,h])(O)O").Matches(molecule) |
+            SmartsPattern.Create("O=[PH](O)O").Matches(molecule)
         ) return "74";
         else if (SmartsPattern.Create("[PX3][F,Cl,Br,I]").Matches(molecule)) return "73";
         else if (SmartsPattern.Create("[PX3]").Matches(molecule)) return "72";
