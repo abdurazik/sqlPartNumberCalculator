@@ -530,8 +530,8 @@ public partial class SynquestPartnumberCalculator
         if (SmartsPattern.Create("[F,Cl,Br,I]S([F,Cl,Br,I])([F,Cl,Br,I])([F,Cl,Br,I])[F,Cl,Br,I]").Matches(molecule)) return "71";
         else if 
         (
-            SmartsPattern.Create("*@[S,s]").Matches(molecule) &&
-            SmartsPattern.Create("*@[!#6,!#16]").Matches(molecule)
+            SmartsPattern.Create("*@[S,s]").Matches(molecule) &
+            SmartsPattern.Create("*@[!#6;!#16]").Matches(molecule)
         ) return "70";
 
         else if 
