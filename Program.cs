@@ -734,7 +734,7 @@ public partial class SynquestPartnumberCalculator
                         if (atom.AtomicNumber > largestAN) largestAN = atom.AtomicNumber;
                     }
 
-                    else if 
+                    if 
                     (
                         atom.AtomicNumber == 9  ||
                         atom.AtomicNumber == 17 ||
@@ -749,7 +749,7 @@ public partial class SynquestPartnumberCalculator
 
                 }
                 
-                if (largestAN == 1)
+                if (largestAN == 1 || largestAN == 0)
                     {
                         if (largestHalogen.ToString().Length == 1) FGCode = string.Format("0{0}",largestHalogen);
                         else FGCode = largestHalogen.ToString();
