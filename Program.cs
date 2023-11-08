@@ -548,8 +548,8 @@ public partial class SynquestPartnumberCalculator
         
         else if (SmartsPattern.Create("S=C").Matches(molecule)) return "67";
         else if (SmartsPattern.Create("[S,s][S,s]").Matches(molecule)) return "66";
-        else if (SmartsPattern.Create("[SX3](=O)O").Matches(molecule)) return "65";
-        else if (SmartsPattern.Create("[SX4](=O)(=O)([O,o])([C,H,O])").Matches(molecule)) return "64";
+        else if (SmartsPattern.Create("[SX3](=O)").Matches(molecule)) return "65";
+        else if (SmartsPattern.Create("[SX4](=O)(=O)([O,o])([C,c,H,O,o])").Matches(molecule)) return "64";
         else if (SmartsPattern.Create("C[SX4](=O)(=O)C").Matches(molecule)) return "63";
         else if 
         (
