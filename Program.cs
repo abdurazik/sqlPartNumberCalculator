@@ -536,8 +536,8 @@ public partial class SynquestPartnumberCalculator
 
         else if 
         (
-            SmartsPattern.Create("S(=O)(=[O,N])N").Matches(molecule) ||
-            SmartsPattern.Create("S(=O)(=O)NS(=O)(=O)").Matches(molecule)
+            SmartsPattern.Create("S(=O)(=[O,N])[N,n]").Matches(molecule) ||
+            SmartsPattern.Create("S(=O)(=O)[N,n]S(=O)(=O)").Matches(molecule)
         ) return "69";
 
         else if 
